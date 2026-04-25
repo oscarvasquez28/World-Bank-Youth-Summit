@@ -47,7 +47,7 @@ export default function Home() {
     setOpportunities([]);
 
     try {
-      const data = await api.analyze(text, country);
+      const data = await api.analyze({ text, country });
       setSkills(data.skills || []);
       setOpportunities(data.opportunities || []);
     } catch (err) {
