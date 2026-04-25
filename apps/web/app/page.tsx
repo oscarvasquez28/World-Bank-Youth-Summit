@@ -3,6 +3,8 @@
 import React, { useState } from "react";
 import SkillInput from "@/components/SkillInput";
 import Results from "@/components/Results";
+import Spinner from "@/components/ui/spinner";
+import { motion } from 'framer-motion';
 import api from "@/lib/api";
 import "@/lib/api.routes";
 
@@ -76,13 +78,14 @@ export default function Home() {
           />
 
           {error && (
-            <div className="mt-4 rounded-md bg-red-50 p-3 text-sm text-red-800">
-              Error: {error}
-            </div>
+            <div className="mt-4 rounded-md bg-red-50 p-3 text-sm text-red-800">Error: {error}</div>
           )}
 
           {loading && (
-            <div className="mt-4 text-center text-sm font-medium text-zinc-600 dark:text-zinc-300">Analyzing...</div>
+            <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="mt-4 flex items-center justify-center gap-2 text-sm font-medium text-zinc-600 dark:text-zinc-300">
+              <Spinner size={18} />
+              <span>Analyzing...</span>
+            </motion.div>
           )}
         </div>
 
