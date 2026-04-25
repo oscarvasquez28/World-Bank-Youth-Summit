@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Inter, JetBrains_Mono } from "next/font/google";
 import "./globals.css";
 import PageTransition from "@/components/PageTransition";
+import Navbar from "@/components/Navbar";
 
 const inter = Inter({
   variable: "--font-sans",
@@ -27,8 +28,11 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" className={`${inter.variable} ${jetbrains.variable} h-full antialiased`}>
-      <body className="min-h-full flex flex-col">
-        <PageTransition>{children}</PageTransition>
+      <body className="min-h-full flex flex-col bg-gradient-to-b from-neutral-50 via-neutral-50 to-neutral-100">
+        <Navbar />
+        <PageTransition>
+          <div className="mx-auto w-full max-w-7xl px-6">{children}</div>
+        </PageTransition>
       </body>
     </html>
   );

@@ -62,35 +62,39 @@ export default function Home() {
   }
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-background p-6 font-sans dark:bg-black">
-      <main className="w-full max-w-3xl">
-        <div className="mb-6 text-center">
-          <h1 className="text-4xl font-bold">Discover Opportunities from Your Skills</h1>
-          <p className="mt-2 text-zinc-600 dark:text-zinc-300">Describe your skills in plain text and get suggested roles and salary ranges.</p>
-        </div>
+    <div className="flex min-h-screen items-start bg-transparent p-8 pt-16 font-sans">
+      <main className="w-full">
+        <div className="mx-auto mb-10 flex justify-center">
+          <div className="w-full rounded-3xl bg-white px-12 py-14 shadow-2xl">
+            <div className="mb-6 text-center">
+              <h1 className="mx-auto max-w-4xl text-6xl font-extrabold leading-tight">Discover Opportunities from Your Skills</h1>
+              <p className="mx-auto mt-4 max-w-2xl text-zinc-600">Describe your skills in plain text and get suggested roles and salary ranges.</p>
+            </div>
 
-        <div className="rounded-2xl bg-card p-6 shadow-sm">
-          <SkillInput
-            onAnalyze={(text, country) => {
-              // prefer remote API; fallback to mock if API unreachable
-              analyzeRemote(text, country).catch(() => mockAnalyze(text, country));
-            }}
-          />
+            <div className="rounded-xl border border-neutral-100 bg-white p-6 shadow-sm">
+              <SkillInput
+                onAnalyze={(text, country) => {
+                  // prefer remote API; fallback to mock if API unreachable
+                  analyzeRemote(text, country).catch(() => mockAnalyze(text, country));
+                }}
+              />
 
-          {error && (
-            <div className="mt-4 rounded-md bg-red-50 p-3 text-sm text-red-800">Error: {error}</div>
-          )}
+              {error && (
+                <div className="mt-4 rounded-md bg-red-50 p-3 text-sm text-red-800">Error: {error}</div>
+              )}
 
-          {loading && (
-            <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="mt-4 flex items-center justify-center gap-2 text-sm font-medium text-zinc-600 dark:text-zinc-300">
-              <Spinner size={18} />
-              <span>Analyzing...</span>
-            </motion.div>
-          )}
+              {loading && (
+                <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="mt-4 flex items-center justify-center gap-2 text-sm font-medium text-zinc-600">
+                  <Spinner size={18} />
+                  <span>Analyzing...</span>
+                </motion.div>
+              )}
+            </div>
+          </div>
         </div>
 
         {!loading && (skills.length > 0 || opportunities.length > 0) && (
-          <div className="mt-6">
+          <div className="mt-8">
             <Results skills={skills} opportunities={opportunities} />
           </div>
         )}
