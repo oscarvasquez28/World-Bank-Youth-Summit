@@ -3,13 +3,17 @@
 import React, { useState } from "react";
 import SkillInput from "@/components/SkillInput";
 import Results from "@/components/Results";
+import api from "@/lib/api";
+import "@/lib/api.routes";
 
 export default function Home() {
   const [loading, setLoading] = useState(false);
   const [skills, setSkills] = useState<string[]>([]);
   const [opportunities, setOpportunities] = useState<{ role: string; salary: string }[]>([]);
+  const [error, setError] = useState<string | null>(null);
 
   function mockAnalyze(text: string, country: string) {
+    // kept for local fallback, but prefer server analyze
     setLoading(true);
     setSkills([]);
     setOpportunities([]);
@@ -36,6 +40,25 @@ export default function Home() {
     }, 900);
   }
 
+  async function analyzeRemote(text: string, country: string) {
+    setLoading(true);
+    setSkills([]);
+    setError(null);
+    setOpportunities([]);
+
+    try {
+      const data = await api.analyze(text, country);
+      setSkills(data.skills || []);
+      setOpportunities(data.opportunities || []);
+    } catch (err) {
+      console.error("Analyze request failed:", err);
+      const msg = err instanceof Error ? err.message : String(err);
+      setError(msg || "Request failed");
+    }
+
+    setLoading(false);
+  }
+
   return (
     <div className="flex min-h-screen items-center justify-center bg-background p-6 font-sans dark:bg-black">
       <main className="w-full max-w-3xl">
@@ -47,9 +70,16 @@ export default function Home() {
         <div className="rounded-2xl bg-card p-6 shadow-sm">
           <SkillInput
             onAnalyze={(text, country) => {
-              mockAnalyze(text, country);
+              // prefer remote API; fallback to mock if API unreachable
+              analyzeRemote(text, country).catch(() => mockAnalyze(text, country));
             }}
           />
+
+          {error && (
+            <div className="mt-4 rounded-md bg-red-50 p-3 text-sm text-red-800">
+              Error: {error}
+            </div>
+          )}
 
           {loading && (
             <div className="mt-4 text-center text-sm font-medium text-zinc-600 dark:text-zinc-300">Analyzing...</div>
