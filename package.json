@@ -1,0 +1,20 @@
+{
+  "name": "unmapped",
+  "private": true,
+  "version": "0.1.0",
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ],
+  "scripts": {
+    "bootstrap": "pnpm install",
+    "dev": "pnpm -w -r run dev",
+    "web": "cd apps/web && pnpm dev",
+    "api": "cd apps/api && pnpm dev",
+    "dev-all": "concurrently \"pnpm run web\" \"pnpm run api\" -n web,api -c blue,green",
+    "build": "pnpm -w -r run build"
+  },
+  "devDependencies": {
+    "concurrently": "^9.2.1"
+  }
+}
