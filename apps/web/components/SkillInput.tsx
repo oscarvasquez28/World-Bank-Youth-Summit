@@ -22,7 +22,7 @@ export default function SkillInput({ onAnalyze }: Props) {
         onChange={(e) => setText(e.target.value)}
       />
 
-      <div className="mt-4 flex gap-3">
+      <div className="mt-4 flex items-end gap-3">
         <div className="w-40">
           <Select value={country} onChange={(e) => setCountry(e.target.value)} label="Country">
             <option value="US">US</option>
