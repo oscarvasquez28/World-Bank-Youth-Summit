@@ -15,6 +15,7 @@ export default function Home() {
   const [opportunities, setOpportunities] = useState<{ role: string; salary: string }[]>([]);
   const [currentSkills, setCurrentSkills] = useState<string[]>([]);
   const [currentOpportunities, setCurrentOpportunities] = useState<{ role: string; salary: string }[]>([]);
+  const [lensData, setLensData] = useState<any | null>(null);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
@@ -32,7 +33,7 @@ export default function Home() {
     setLoading(true);
 
     // simple mock: extract words longer than 3 letters and treat some as skills
-    setTimeout(() => {
+    setTimeout(async () => {
       const tokens = text
         .split(/[^A-Za-z0-9\+\#\-]+/)
         .map((t) => t.trim())
@@ -49,6 +50,24 @@ export default function Home() {
       // set current results for the Results panel (only show these on Discover)
       setCurrentSkills(detected);
       setCurrentOpportunities(opps);
+
+      // call lens endpoint with detected skills
+      try {
+        const lens = await api.lens({ skills: detected, country });
+        setLensData(lens);
+      } catch (e) {
+        console.warn('Failed to fetch lens data', e);
+        setLensData(null);
+      }
+
+      // call lens endpoint with detected skills (best-effort)
+      try {
+        const lens = await api.lens({ skills: detected });
+        setLensData(lens);
+      } catch (e) {
+        console.warn('Failed to fetch lens data (mock)', e);
+        setLensData(null);
+      }
 
       setSkills((prev) => {
         const merged = Array.from(new Set([...prev, ...detected]));
@@ -87,6 +106,15 @@ export default function Home() {
       // current results - only these should be shown on Discover
       setCurrentSkills(detected);
       setCurrentOpportunities(opps);
+      
+      // call lens endpoint with detected skills (real API path)
+      try {
+        const lens = await api.lens({ skills: detected });
+        setLensData(lens);
+      } catch (e) {
+        console.warn('Failed to fetch lens data', e);
+        setLensData(null);
+      }
 
       setSkills((prev) => {
         const merged = Array.from(new Set([...prev, ...detected]));
@@ -153,7 +181,7 @@ export default function Home() {
 
         {!loading && (currentSkills.length > 0 || currentOpportunities.length > 0) && (
           <div className="mt-8">
-            <Results skills={currentSkills} opportunities={currentOpportunities} />
+            <Results skills={currentSkills} opportunities={currentOpportunities} lens={lensData} />
           </div>
         )}
       </main>
