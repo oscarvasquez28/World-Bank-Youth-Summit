@@ -33,6 +33,11 @@ class SkillsRequest(BaseModel):
         description="List of free-text descriptions (CV excerpts, self-descriptions, etc.)",
         json_schema_extra={"example": ["I am good at communication, teamwork, and data analysis"]},
     )
+    locale: str = Field(
+        default="USA",
+        description="Country code for output language (USA=English, MEX=Spanish). "
+        "Input text is expected in English; output labels will be in this language.",
+    )
 
 
 class MappedSkill(BaseModel):
@@ -59,8 +64,8 @@ class SkillsResponse(BaseModel):
     response_model=SkillsResponse,
     summary="Extract & map skills from free text",
     description=(
-        "Accepts one or more passages of informal text and returns the "
-        "skills detected, each mapped to the ESCO taxonomy."
+        "Accepts one or more passages of informal text (in English) and returns the "
+        "skills detected, each mapped to the ESCO taxonomy and translated to the target locale."
     ),
 )
 async def extract(payload: SkillsRequest) -> SkillsResponse:
@@ -70,11 +75,16 @@ async def extract(payload: SkillsRequest) -> SkillsResponse:
     Heavy NLP work is offloaded to a thread-pool so it does not block the
     async event loop (per project anti-pattern rules).
     """
+    from ml_engine.SkillAssessor import resolve_locale
+    
     try:
+        lang = resolve_locale(payload.locale)
         loop = asyncio.get_running_loop()
         results: list[dict[str, Any]] = await loop.run_in_executor(
-            None, extract_skills, payload.texts
+            None, extract_skills, payload.texts, lang
         )
+    except ValueError as exc:
+        raise HTTPException(status_code=422, detail=str(exc)) from exc
     except Exception as exc:
         logger.exception("Skills extraction failed")
         raise HTTPException(status_code=500, detail=str(exc)) from exc

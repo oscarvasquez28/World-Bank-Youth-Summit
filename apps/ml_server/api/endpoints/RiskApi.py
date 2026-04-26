@@ -2,6 +2,8 @@
 RiskApi.py – Returns the automation-risk assessment with LIME explanation.
 
 POST /api/risk/assess
+POST /api/risk/lens
+POST /api/risk/occupations
 """
 
 from __future__ import annotations
@@ -62,6 +64,11 @@ class LensRequest(BaseModel):
     skills_profile: list[str] = Field(
         ..., description="List of ESCO skills (labels or URIs) possessed by the user"
     )
+    locale: str = Field(
+        default="USA",
+        description="Country code for language (USA=English, MEX=Spanish). "
+        "Input skills must be in this language; response will be in this language.",
+    )
 
 
 class SkillRiskItem(BaseModel):
@@ -76,8 +83,29 @@ class LensResponse(BaseModel):
     market_context: dict[str, Any]
 
 
+class OccupationsRequest(BaseModel):
+    skills: list[str] = Field(
+        ..., min_length=1, description="List of ESCO skill labels"
+    )
+    locale: str = Field(
+        default="USA",
+        description="Country code for language (USA=English, MEX=Spanish). "
+        "Input skills and response will be in this language.",
+    )
+    top_n: int = Field(
+        default=10, ge=1, le=50, description="Max number of occupations to return"
+    )
+
+
+class OccupationDetail(BaseModel):
+    matching_skills: list[str] = Field(..., description="Skills from user input that match this occupation")
+    description: str = Field(..., description="Job description from ESCO")
+    matching_percentage: float = Field(..., description="Percentage of occupation skills matched")
+
+
+
 # ---------------------------------------------------------------------------
-# Endpoint
+# Endpoints
 # ---------------------------------------------------------------------------
 
 
@@ -111,14 +139,23 @@ async def assess(payload: RiskRequest) -> RiskResponse:
     return RiskResponse(**result)
 
 
-def _process_lens(country_code: str, skills_profile: list[str]) -> dict:
-    from ml_engine.SkillAssessor import evaluate_skills_risk, recommend_adjacent_skills
+def _process_lens(country_code: str, skills_profile: list[str], locale: str) -> dict:
+    from ml_engine.SkillAssessor import (
+        evaluate_skills_risk,
+        recommend_adjacent_skills,
+        resolve_locale,
+    )
     from ml_engine.Econometrics import fetch_education_projections, fetch_country_indicators
 
+    lang = resolve_locale(locale)
     indicators = fetch_country_indicators(country_code)
 
-    at_risk, durable = evaluate_skills_risk(indicators, skills_profile)
-    resilience_pathways = recommend_adjacent_skills(indicators, durable)
+    at_risk, durable = evaluate_skills_risk(
+        indicators, skills_profile, input_lang=lang, output_lang=lang
+    )
+    resilience_pathways = recommend_adjacent_skills(
+        indicators, durable, output_lang=lang
+    )
     market_context = fetch_education_projections(country_code)
 
     return {
@@ -133,7 +170,11 @@ def _process_lens(country_code: str, skills_profile: list[str]) -> dict:
     "/lens",
     response_model=LensResponse,
     summary="AI Readiness & Displacement Risk Lens",
-    description="Analyzes individual skills for automation risk and recommends resilient adjacent skills, along with educational projections.",
+    description=(
+        "Analyzes individual skills for automation risk and recommends "
+        "resilient adjacent skills, along with educational projections. "
+        "Set locale to MEX for Spanish or USA for English."
+    ),
 )
 async def lens(payload: LensRequest) -> LensResponse:
     try:
@@ -143,9 +184,61 @@ async def lens(payload: LensRequest) -> LensResponse:
             _process_lens,
             payload.country_code,
             payload.skills_profile,
+            payload.locale,
         )
+    except ValueError as exc:
+        raise HTTPException(status_code=422, detail=str(exc)) from exc
     except Exception as exc:
         logger.exception("Lens assessment failed")
         raise HTTPException(status_code=500, detail=str(exc)) from exc
 
     return LensResponse(**result)
+
+
+def _process_occupations(skills: list[str], locale: str, top_n: int) -> dict[str, Any]:
+    from ml_engine.SkillAssessor import match_occupations, resolve_locale
+
+    lang = resolve_locale(locale)
+    occupations_list = match_occupations(skills, lang=lang, top_n=top_n)
+
+    # Convert list to the requested dictionary format: { occupation_name: { details } }
+    results = {}
+    for item in occupations_list:
+        occ_name = item["occupation"]
+        results[occ_name] = {
+            "matching_skills": item["matching_skills"],
+            "description": item["description"],
+            "matching_percentage": item["matching_percentage"]
+        }
+
+    return results
+
+
+@router.post(
+    "/occupations",
+    response_model=dict[str, OccupationDetail],
+    summary="Match skills to occupations",
+    description=(
+        "Given a set of ESCO skills, returns a dictionary of the occupations that best match "
+        "based on the percentage of their required skills that the user possesses. "
+        "Set locale to MEX for Spanish or USA for English."
+    ),
+)
+async def occupations(payload: OccupationsRequest) -> dict[str, Any]:
+    try:
+        loop = asyncio.get_running_loop()
+        result = await loop.run_in_executor(
+            None,
+            _process_occupations,
+            payload.skills,
+            payload.locale,
+            payload.top_n,
+        )
+    except ValueError as exc:
+        raise HTTPException(status_code=422, detail=str(exc)) from exc
+    except Exception as exc:
+        logger.exception("Occupation matching failed")
+        raise HTTPException(status_code=500, detail=str(exc)) from exc
+
+    return result
+
