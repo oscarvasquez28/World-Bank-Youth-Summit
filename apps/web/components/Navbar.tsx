@@ -51,7 +51,8 @@ export default function Navbar() {
               <circle cx="24" cy="20" r="6" fill="#1e2937" />
               <path d="M24 8 L24 32" stroke="#f1f5f9" strokeWidth="3" strokeLinecap="round" />
             </g>
-            <text x="70" y="39" fontFamily="Inter, system-ui, sans-serif" fontSize="37" fontWeight="700" letterSpacing="-0.035em" fill="currentColor">UNMAPPED</text>
+            <text x="70" y="34" fontFamily="Inter, system-ui, sans-serif" fontSize="32" fontWeight="700" letterSpacing="-0.035em" fill="currentColor">UNMAPPED</text>
+            <text x="70" y="50" fontFamily="Inter, system-ui, sans-serif" fontSize="11" fontWeight="500" letterSpacing="0.25em" fill="currentColor" opacity="0.7">TREPALDO</text>
           </svg>
         </div>
         <nav className="hidden sm:flex flex-1 justify-center items-center gap-6 text-sm">
