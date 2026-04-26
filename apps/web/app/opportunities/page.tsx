@@ -14,8 +14,13 @@ import { useRouter } from 'next/navigation';
 type Opportunity = { role: string; salary?: string };
 type OccupationInfo = {
   matching_skills?: string[];
+  missing_essential_skills?: string[];
   description?: string;
   matching_percentage?: number;
+  isced_level?: number;
+  opportunity_type?: string;
+  sector_growth?: number | null;
+  wage_signal?: number | null;
 };
 type OccupationsResponse = Record<string, OccupationInfo>;
 
@@ -35,6 +40,12 @@ export default function OpportunitiesPage() {
       .toLowerCase()
       .replace(/\b\w/g, (c) => c.toUpperCase());
   const formatRawPercentage = (v?: number) => (typeof v === 'number' ? `${Number(v.toFixed(2))}%` : '-');
+  const formatSignedPercentage = (v?: number | null) =>
+    typeof v === 'number' ? `${v > 0 ? '+' : ''}${Number(v.toFixed(2))}%` : '-';
+  const formatWageSignal = (v?: number | null) => {
+    if (typeof v !== 'number' || !Number.isFinite(v)) return '-';
+    return `$${Math.round(v).toLocaleString()}/mo`;
+  };
 
   const iscedLabel = (lvl?: number | null) => {
     if (lvl === null || typeof lvl !== 'number') return '-';
@@ -309,6 +320,41 @@ export default function OpportunitiesPage() {
                                   </div>
                                 </div>
                                 <div className="text-sm text-zinc-500 dark:text-zinc-400">{info?.description || t('results.role_description')}</div>
+                                <div className="flex flex-wrap gap-2 text-xs">
+                                  {(() => {
+                                    const v = info?.sector_growth;
+                                    const tone =
+                                      typeof v === 'number' && v > 0
+                                        ? 'bg-emerald-50 text-emerald-700 dark:bg-emerald-900/40 dark:text-emerald-200'
+                                        : typeof v === 'number' && v < 0
+                                        ? 'bg-rose-50 text-rose-700 dark:bg-rose-900/40 dark:text-rose-200'
+                                        : 'bg-zinc-100 text-zinc-600 dark:bg-zinc-800 dark:text-zinc-300';
+                                    const arrow =
+                                      typeof v === 'number' && v > 0 ? '▲' : typeof v === 'number' && v < 0 ? '▼' : '•';
+                                    return (
+                                      <span className={`inline-flex items-center gap-1 rounded-full px-2 py-0.5 font-medium ${tone}`}>
+                                        <span aria-hidden>{arrow}</span>
+                                        {t('results.sector_growth')}: {typeof v === 'number' ? formatSignedPercentage(v) : t('results.no_data')}
+                                      </span>
+                                    );
+                                  })()}
+                                  {(() => {
+                                    const v = info?.wage_signal;
+                                    const has = typeof v === 'number' && Number.isFinite(v);
+                                    return (
+                                      <span
+                                        className={`inline-flex items-center gap-1 rounded-full px-2 py-0.5 font-medium ${
+                                          has
+                                            ? 'bg-amber-50 text-amber-700 dark:bg-amber-900/40 dark:text-amber-200'
+                                            : 'bg-zinc-100 text-zinc-600 dark:bg-zinc-800 dark:text-zinc-300'
+                                        }`}
+                                      >
+                                        <span aria-hidden>$</span>
+                                        {t('results.wage_signal')}: {has ? formatWageSignal(v) : t('results.no_data')}
+                                      </span>
+                                    );
+                                  })()}
+                                </div>
                                 {Array.isArray(info?.missing_essential_skills) && info!.missing_essential_skills!.length > 0 && (
                                   <div className="mt-3">
                                     <div className="text-xs font-semibold text-zinc-700 dark:text-zinc-300">{t('results.missing_essential_skills')}:</div>
@@ -347,6 +393,41 @@ export default function OpportunitiesPage() {
                               </div>
                             </div>
                             <div className="text-sm text-zinc-500 dark:text-zinc-400">{info?.description || t('results.role_description')}</div>
+                            <div className="flex flex-wrap gap-2 text-xs">
+                              {(() => {
+                                const v = info?.sector_growth;
+                                const tone =
+                                  typeof v === 'number' && v > 0
+                                    ? 'bg-emerald-50 text-emerald-700 dark:bg-emerald-900/40 dark:text-emerald-200'
+                                    : typeof v === 'number' && v < 0
+                                    ? 'bg-rose-50 text-rose-700 dark:bg-rose-900/40 dark:text-rose-200'
+                                    : 'bg-zinc-100 text-zinc-600 dark:bg-zinc-800 dark:text-zinc-300';
+                                const arrow =
+                                  typeof v === 'number' && v > 0 ? '▲' : typeof v === 'number' && v < 0 ? '▼' : '•';
+                                return (
+                                  <span className={`inline-flex items-center gap-1 rounded-full px-2 py-0.5 font-medium ${tone}`}>
+                                    <span aria-hidden>{arrow}</span>
+                                    {t('results.sector_growth')}: {typeof v === 'number' ? formatSignedPercentage(v) : t('results.no_data')}
+                                  </span>
+                                );
+                              })()}
+                              {(() => {
+                                const v = info?.wage_signal;
+                                const has = typeof v === 'number' && Number.isFinite(v);
+                                return (
+                                  <span
+                                    className={`inline-flex items-center gap-1 rounded-full px-2 py-0.5 font-medium ${
+                                      has
+                                        ? 'bg-amber-50 text-amber-700 dark:bg-amber-900/40 dark:text-amber-200'
+                                        : 'bg-zinc-100 text-zinc-600 dark:bg-zinc-800 dark:text-zinc-300'
+                                    }`}
+                                  >
+                                    <span aria-hidden>$</span>
+                                    {t('results.wage_signal')}: {has ? formatWageSignal(v) : t('results.no_data')}
+                                  </span>
+                                );
+                              })()}
+                            </div>
                             {Array.isArray(info?.missing_essential_skills) && info!.missing_essential_skills!.length > 0 && (
                               <div className="mt-3">
                                 <div className="text-xs font-semibold text-zinc-700 dark:text-zinc-300">{t('results.missing_essential_skills')}:</div>
