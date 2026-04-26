@@ -18,20 +18,50 @@ app.use((req, res, next) => {
 
 app.get('/', (_req, res) => res.send('Hello from apps/api'));
 
-app.post('/analyze', (req, res) => {
+app.post('/analyze', async (req, res) => {
 	try {
 		console.log('POST /analyze', { headers: req.headers, body: req.body });
 
 		const { text = '', country = 'US' } = (req.body && typeof req.body === 'object') ? req.body : { text: String(req.body || ''), country: 'US' };
 
-		// same simple tokenization used by frontend mock
+		// default/simple tokenization used as a fallback
 		const tokens = String(text)
 			.split(/[^A-Za-z0-9\+\#\-]+/)
 			.map((t) => t.trim())
 			.filter((t) => t.length > 2)
 			.slice(0, 8);
 
-		const detected = Array.from(new Set(tokens)).slice(0, 8);
+		// Start with the fallback detected list, but attempt to call the external model
+		let detected = Array.from(new Set(tokens)).slice(0, 8);
+
+		try {
+			const modelRes = await fetch('http://localhost:8000/api/skills/extract', {
+				method: 'POST',
+				headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+				body: JSON.stringify({ texts: [String(text)] }),
+			});
+
+			if (modelRes.ok) {
+				const json = await modelRes.json();
+
+				// Expected structure: { results: [ { text: string, skills: [ { raw, mapped } ] } ] }
+				if (json && Array.isArray(json.results) && json.results[0] && Array.isArray(json.results[0].skills)) {
+					const mapped = json.results[0].skills
+						.map((s: any) => (s && (s.mapped || s.raw) ? (s.mapped || s.raw) : null))
+						.filter(Boolean)
+						.slice(0, 8);
+
+						console.log('Model detected skills', mapped);
+						detected = Array.from(new Set(mapped)).slice(0, 8);
+				} else {
+					console.warn('Unexpected model response shape', { body: json });
+				}
+			} else {
+				console.warn('Model API returned non-ok status', modelRes.status, await modelRes.text().catch(() => ''));
+			}
+		} catch (e) {
+			console.warn('Failed to call external skills model, falling back to tokenization', e);
+		}
 
 		const opportunities = detected.slice(0, 4).map((s) => ({
 			role: `${s} Specialist`,
