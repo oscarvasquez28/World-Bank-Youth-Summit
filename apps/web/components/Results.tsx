@@ -1,9 +1,9 @@
 "use client";
 
 import React from "react";
-import { motion } from 'framer-motion';
 import { Badge } from "@/components/ui/badge";
 import { Card } from "@/components/ui/card";
+import PassportCard from "@/components/PassportCard";
 import { useI18n } from '@/lib/i18n'
 
 type Opportunity = {
@@ -22,36 +22,48 @@ type Lens = {
   skills_at_risk?: string[] | LensSkill[];
   durable_skills?: LensSkill[];
   resilience_pathways?: LensSkill[];
+  credential?: Record<string, any>;
+  passport?: Record<string, any>;
+  jsonld?: Record<string, any>;
+  credentials?: Array<Record<string, any>>;
 };
 
-export default function Results({ skills, opportunities, lens }: Props & { lens?: Lens | null }) {
-  const { t } = useI18n();
-  const container = {
-    hidden: { opacity: 0, y: 8 },
-    show: { opacity: 1, y: 0, transition: { staggerChildren: 0.06 } },
-  };
+function extractCredential(lens?: Lens | null, credential?: Record<string, any> | null) {
+  if (credential && typeof credential === 'object') return credential;
+  if (!lens) return null;
+  if (lens.credential && typeof lens.credential === 'object') return lens.credential;
+  if (lens.passport && typeof lens.passport === 'object') return lens.passport;
+  if (lens.jsonld && typeof lens.jsonld === 'object') return lens.jsonld;
+  if (Array.isArray(lens.credentials) && lens.credentials[0] && typeof lens.credentials[0] === 'object') return lens.credentials[0];
+  return null;
+}
 
-  const item = {
-    hidden: { opacity: 0, y: 8 },
-    show: { opacity: 1, y: 0, transition: { type: 'spring', stiffness: 300, damping: 20 } },
-  };
+export default function Results({ skills, opportunities, lens, credential }: Props & { lens?: Lens | null; credential?: Record<string, any> | null }) {
+  const { t } = useI18n();
+  const passportCredential = extractCredential(lens, credential);
 
   return (
-    <motion.div initial="hidden" animate="show" variants={container} className="mt-8 w-full">
+    <div className="mt-8 w-full">
       <Card>
-        <motion.h3 variants={item} className="mb-3 text-lg font-semibold dark:text-zinc-100">{t('results.detected')}</motion.h3>
-        <motion.div variants={item} className="mb-4 flex flex-wrap gap-2">
+        {passportCredential && (
+          <div className="mb-6">
+            <PassportCard credential={passportCredential} />
+          </div>
+        )}
+
+        <h3 className="mb-3 text-lg font-semibold dark:text-zinc-100">{t('results.detected')}</h3>
+        <div className="mb-4 flex flex-wrap gap-2">
           {skills.length === 0 && <p className="text-sm text-zinc-500 dark:text-zinc-400">{t('results.no_skills')}</p>}
           {skills.map((s, idx) => (
             <Badge key={`${s}-${idx}`}>{s}</Badge>
           ))}
-        </motion.div>
+        </div>
 
         {/* Lens sections (skills at risk, durable skills, resilience pathways) */}
         {lens && (
           <>
-            <motion.h3 variants={item} className="mb-3 mt-2 text-lg font-semibold dark:text-zinc-100">{t('results.skills_at_risk') || 'Skills At Risk'}</motion.h3>
-            <motion.div variants={item} className="mb-4 flex flex-wrap gap-2">
+            <h3 className="mb-3 mt-2 text-lg font-semibold dark:text-zinc-100">{t('results.skills_at_risk') || 'Skills At Risk'}</h3>
+            <div className="mb-4 flex flex-wrap gap-2">
               {Array.isArray(lens.skills_at_risk) && lens.skills_at_risk.length === 0 && (
                 <p className="text-sm text-zinc-500 dark:text-zinc-400">{t('results.no_risks') || 'No skills at risk identified.'}</p>
               )}
@@ -63,10 +75,10 @@ export default function Results({ skills, opportunities, lens }: Props & { lens?
                   </Badge>
                 );
               })}
-            </motion.div>
+            </div>
 
-            <motion.h3 variants={item} className="mb-3 mt-2 text-lg font-semibold dark:text-zinc-100">{t('results.durable_skills') || 'Durable Skills'}</motion.h3>
-            <motion.div variants={item} className="mb-4 flex flex-wrap gap-2">
+            <h3 className="mb-3 mt-2 text-lg font-semibold dark:text-zinc-100">{t('results.durable_skills') || 'Durable Skills'}</h3>
+            <div className="mb-4 flex flex-wrap gap-2">
               {Array.isArray(lens.durable_skills) && lens.durable_skills.length === 0 && (
                 <p className="text-sm text-zinc-500 dark:text-zinc-400">{t('results.no_durable') || 'No durable skills identified.'}</p>
               )}
@@ -80,10 +92,10 @@ export default function Results({ skills, opportunities, lens }: Props & { lens?
                   </div>
                 </Badge>
               ))}
-            </motion.div>
+            </div>
 
-            <motion.h3 variants={item} className="mb-3 mt-2 text-lg font-semibold dark:text-zinc-100">{t('results.resilience_pathways') || 'Resilience Pathways'}</motion.h3>
-            <motion.div variants={item} className="mb-4 flex flex-wrap gap-2">
+            <h3 className="mb-3 mt-2 text-lg font-semibold dark:text-zinc-100">{t('results.resilience_pathways') || 'Resilience Pathways'}</h3>
+            <div className="mb-4 flex flex-wrap gap-2">
               {Array.isArray(lens.resilience_pathways) && lens.resilience_pathways.length === 0 && (
                 <p className="text-sm text-zinc-500 dark:text-zinc-400">{t('results.no_resilience') || 'No resilience pathways identified.'}</p>
               )}
@@ -97,14 +109,14 @@ export default function Results({ skills, opportunities, lens }: Props & { lens?
                   </div>
                 </Badge>
               ))}
-            </motion.div>
+            </div>
           </>
         )}
 
-        <motion.h3 variants={item} className="mb-3 mt-2 text-lg font-semibold dark:text-zinc-100">{t('results.suggested')}</motion.h3>
-        <motion.div variants={item} className="grid gap-4 md:grid-cols-2">
+        <h3 className="mb-3 mt-2 text-lg font-semibold dark:text-zinc-100">{t('results.suggested')}</h3>
+        <div className="grid gap-4 md:grid-cols-2">
           {opportunities.map((o, idx) => (
-            <motion.div key={`${o.role}-${idx}`} whileHover={{ scale: 1.02 }} transition={{ type: 'spring', stiffness: 300 }}>
+            <div key={`${o.role}-${idx}`}>
               <Card className="relative flex flex-col gap-3 p-4 shadow-sm hover:shadow-md dark:shadow-none">
                 <div className="flex items-start justify-between gap-4">
                   <div>
@@ -118,11 +130,11 @@ export default function Results({ skills, opportunities, lens }: Props & { lens?
                 </div>
                 <div className="text-sm text-zinc-500 dark:text-zinc-400">{t('results.role_description')}</div>
               </Card>
-            </motion.div>
+            </div>
           ))}
           {opportunities.length === 0 && <p className="text-sm text-zinc-500 dark:text-zinc-400">{t('results.no_opps')}</p>}
-        </motion.div>
+        </div>
       </Card>
-    </motion.div>
+    </div>
   );
 }
