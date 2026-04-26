@@ -7,6 +7,7 @@ geographically agnostic (no hardcoded locales).
 
 from __future__ import annotations
 
+import json
 import logging
 from typing import Any
 
@@ -14,32 +15,31 @@ import pandas as pd
 import wbgapi as wb
 from pathlib import Path
 
+from api.core.Config import get_settings
+
 logger = logging.getLogger(__name__)
 
 # ---------------------------------------------------------------------------
 # Global datasets
 # ---------------------------------------------------------------------------
-DATA_DIR = Path(__file__).parent.parent / "local_models" / "training_data"
+_settings = get_settings()
+_BASE_DIR = Path(__file__).parent.parent
+DATA_DIR = _BASE_DIR / _settings.TRAINING_DATA_DIR
+
 try:
-    WCDE_DATA = pd.read_csv(DATA_DIR / "wcde_data.csv", skiprows=8)
+    WCDE_DATA = pd.read_csv(
+        DATA_DIR / _settings.WITTGENSTEIN_CSV,
+        skiprows=_settings.WITTGENSTEIN_SKIP_ROWS,
+    )
 except Exception as e:
-    logger.error(f"Failed to load wcde_data.csv: {e}")
+    logger.error(f"Failed to load {_settings.WITTGENSTEIN_CSV}: {e}")
     WCDE_DATA = pd.DataFrame()
 
 # ---------------------------------------------------------------------------
 # Indicator codes (World Development Indicators – WDI)
 # ---------------------------------------------------------------------------
-# These are representative WDI series used for the risk-calibration model.
-# Additional indicators can be appended here without changing downstream code.
-INDICATOR_MAP: dict[str, str] = {
-    "broadband_penetration": "IT.NET.BBND.P2",       # Fixed broadband subs per 100 people
-    "internet_users_pct": "IT.NET.USER.ZS",           # Individuals using the Internet (%)
-    "mobile_cellular_subs": "IT.CEL.SETS.P2",          # Mobile cellular subs per 100 people
-    "gdp_per_capita_ppp": "NY.GDP.PCAP.PP.CD",         # GDP per capita, PPP (current intl $)
-    "unemployment_youth": "SL.UEM.1524.ZS",            # Unemployment, youth total (% 15-24)
-    "labor_force_participation": "SL.TLF.CACT.ZS",     # Labor force participation rate (%)
-    "school_enrollment_tertiary": "SE.TER.ENRR",       # School enrollment, tertiary (% gross)
-}
+# Loaded from config so deployers can swap indicators via .env.
+INDICATOR_MAP: dict[str, str] = json.loads(_settings.WDI_INDICATOR_MAP)
 
 # The most recent years to query (descending so the first non-NaN wins).
 _RECENT_YEARS = range(2023, 2009, -1)

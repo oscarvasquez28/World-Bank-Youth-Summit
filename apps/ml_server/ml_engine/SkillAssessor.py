@@ -7,25 +7,28 @@ Uses ESCO taxonomy mappings and ILO automation risk data.
 import logging
 import pandas as pd
 from pathlib import Path
+from api.core.Config import get_settings
 
 logger = logging.getLogger(__name__)
 
-DATA_DIR = Path(__file__).parent.parent / "local_models" / "training_data"
+_settings = get_settings()
+BASE_DIR = Path(__file__).parent.parent
+DATA_DIR = BASE_DIR / _settings.TRAINING_DATA_DIR
 
 def _load_data():
     try:
         # 1. Load skill relations
-        df_relations = pd.read_csv(DATA_DIR / "occupationSkillRelations_en.csv", usecols=["occupationUri", "skillUri"])
+        df_relations = pd.read_csv(DATA_DIR / _settings.OCCUPATION_SKILL_RELATIONS_CSV, usecols=["occupationUri", "skillUri"])
         
         # 2. Load occupations
-        df_occupations = pd.read_csv(DATA_DIR / "occupations_en.csv", usecols=["conceptUri", "iscoGroup"])
+        df_occupations = pd.read_csv(DATA_DIR / _settings.OCCUPATIONS_CSV, usecols=["conceptUri", "iscoGroup"])
         
         # 3. Load ILO risk
-        df_ilo = pd.read_csv(DATA_DIR / "tableA1Data.csv", usecols=["4-digit code", "Mean"])
+        df_ilo = pd.read_csv(DATA_DIR / _settings.ILO_RISK_CSV, usecols=["4-digit code", "Mean"])
         df_ilo["Mean"] = pd.to_numeric(df_ilo["Mean"], errors="coerce")
         
         # 4. Load Skills
-        df_skills = pd.read_csv(DATA_DIR / "skills_en.csv", usecols=["conceptUri", "preferredLabel", "altLabels"])
+        df_skills = pd.read_csv(DATA_DIR / _settings.SKILLS_CSV, usecols=["conceptUri", "preferredLabel", "altLabels"])
         
         # Calculate average risk per skill
         # Merge relations with occupations to get iscoGroup for each skill
@@ -66,8 +69,8 @@ SKILL_RISK_MAP, URI_TO_LABEL, LABEL_TO_URI, ALT_LABEL_TO_URI, DF_RELATIONS = _lo
 
 from ml_engine.RiskModel import predict_skill_risk
 
-# Risk threshold based on calibrated 0-100 scale (e.g. 55)
-CALIBRATED_RISK_THRESHOLD = 55.0
+# Risk threshold from config (configurable via .env)
+CALIBRATED_RISK_THRESHOLD = _settings.CALIBRATED_RISK_THRESHOLD
 
 def evaluate_skills_risk(indicators: dict, skills: list[str]) -> tuple[list[dict], list[dict]]:
     """

@@ -27,6 +27,32 @@ class Settings(BaseSettings):
 
     # ── Risk Model ────────────────────────────────────
     RISK_MODEL_PATH: str = "local_models/RiskRegressor.pkl"
+    CALIBRATED_RISK_THRESHOLD: float = 55.0
+
+    # ── Training Data Sources ─────────────────────────
+    # Relative to the ml_server root (apps/ml_server/)
+    TRAINING_DATA_DIR: str = "local_models/training_data"
+    SKILLS_CSV: str = "skills_en.csv"
+    OCCUPATIONS_CSV: str = "occupations_en.csv"
+    OCCUPATION_SKILL_RELATIONS_CSV: str = "occupationSkillRelations_en.csv"
+    ILO_RISK_CSV: str = "tableA1Data.csv"
+    WITTGENSTEIN_CSV: str = "wcde_data.csv"
+
+    # ── World Bank Indicator Codes (WDI) ──────────────
+    # JSON-encoded mapping of human-readable names → WDI series codes.
+    # Override via .env to swap to different labor-market indicators.
+    WDI_INDICATOR_MAP: str = (
+        '{"broadband_penetration":"IT.NET.BBND.P2",'
+        '"internet_users_pct":"IT.NET.USER.ZS",'
+        '"mobile_cellular_subs":"IT.CEL.SETS.P2",'
+        '"gdp_per_capita_ppp":"NY.GDP.PCAP.PP.CD",'
+        '"unemployment_youth":"SL.UEM.1524.ZS",'
+        '"labor_force_participation":"SL.TLF.CACT.ZS",'
+        '"school_enrollment_tertiary":"SE.TER.ENRR"}'
+    )
+
+    # ── Wittgenstein Projections ───────────────────────
+    WITTGENSTEIN_SKIP_ROWS: int = 8
 
     model_config = {
         "env_file": ".env",
