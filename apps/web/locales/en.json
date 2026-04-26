@@ -55,6 +55,7 @@
     ,"results.sector_growth": "Sector growth"
     ,"results.wage_signal": "Wage signal"
     ,"results.no_data": "No data"
+    ,"footer.esco_attribution": "This service uses the ESCO classification of the European Commission."
   ,"badge.issued_to": "Issued to"
   ,"badge.issued_on": "Issued on"
   ,"badge.uid": "Credential ID"
