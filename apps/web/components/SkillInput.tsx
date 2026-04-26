@@ -14,25 +14,25 @@ export default function SkillInput({ onAnalyze }: Props) {
   const [country, setCountry] = useState("US");
 
   return (
-    <div className="w-full max-w-2xl">
+    <div className="w-full max-w-3xl mx-auto">
       <Textarea
         label="Describe your skills"
         placeholder="I help customers and use Excel to build reports..."
         value={text}
         onChange={(e) => setText(e.target.value)}
+        className="min-h-[110px]"
       />
 
-      <div className="mt-4 flex gap-3">
-        <div className="w-40">
+      <div className="mt-5 flex items-end gap-4">
+        <div className="w-48">
           <Select value={country} onChange={(e) => setCountry(e.target.value)} label="Country">
-            <option value="US">US</option>
-            <option value="MX">MX</option>
+            <option value="US">🇺🇸 United States</option>
+            <option value="MX">🇲🇽 Mexico</option>
           </Select>
         </div>
-
-        <div className="flex-1">
+        <div className="ml-auto w-48">
           <Button
-            className="w-full bg-black text-white hover:bg-black/90"
+            className="w-full bg-black text-white hover:bg-neutral-900 h-10 px-3 py-2 rounded-lg text-sm"
             onClick={() => onAnalyze(text, country)}
           >
             Analyze
