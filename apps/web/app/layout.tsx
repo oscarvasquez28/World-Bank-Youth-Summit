@@ -3,6 +3,7 @@ import { Inter, JetBrains_Mono } from "next/font/google";
 import "./globals.css";
 import PageTransition from "@/components/PageTransition";
 import Navbar from "@/components/Navbar";
+import Footer from "@/components/Footer";
 import { Toaster } from 'sonner';
 import { I18nProvider } from '@/lib/i18n';
 import { headers } from 'next/headers';
@@ -60,8 +61,9 @@ export default async function RootLayout({ children }: Readonly<{ children: Reac
         <I18nProvider initialLocale={localeCookie}>
           <Navbar />
           <PageTransition>
-            <div className="mx-auto w-full max-w-7xl px-6">{children}</div>
+            <div className="mx-auto w-full max-w-7xl px-6 flex-1">{children}</div>
           </PageTransition>
+          <Footer />
         </I18nProvider>
         {/* development debug panel removed */}
         <Toaster richColors position="top-center" />
