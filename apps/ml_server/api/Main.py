@@ -75,10 +75,12 @@ app.add_middleware(
 from api.endpoints.SkillsApi import router as skills_router  # noqa: E402
 from api.endpoints.RiskApi import router as risk_router  # noqa: E402
 from api.endpoints.BadgesApi import router as badges_router  # noqa: E402
+from api.endpoints.DashboardApi import router as dashboard_router  # noqa: E402
 
 app.include_router(skills_router)
 app.include_router(risk_router)
 app.include_router(badges_router)
+app.include_router(dashboard_router)
 
 
 # ---------------------------------------------------------------------------
