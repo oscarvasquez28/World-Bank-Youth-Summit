@@ -26,6 +26,8 @@
   "results.durable_skills": "Durable Skills",
   "results.resilience_pathways": "Resilience Pathways",
   "results.role_description": "Brief description placeholder for the role."
+  ,"results.occupations_title": "Matching Occupations"
+  ,"results.no_occupations": "No occupations found yet."
   ,"opportunities.title": "Opportunities"
   ,"opportunities.search_placeholder": "Search skills..."
   ,"opportunities.no_skills_saved": "No skills saved yet."

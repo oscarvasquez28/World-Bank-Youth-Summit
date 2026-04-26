@@ -26,6 +26,8 @@
   "results.resilience_pathways": "Caminos de resiliencia",
   "results.no_opps": "Aún no hay oportunidades.",
   "results.role_description": "Descripción breve de ejemplo para el rol."
+  ,"results.occupations_title": "Ocupaciones relacionadas"
+  ,"results.no_occupations": "Aún no se encontraron ocupaciones."
   ,"opportunities.title": "Oportunidades"
   ,"opportunities.search_placeholder": "Buscar habilidades..."
   ,"opportunities.no_skills_saved": "Aún no hay habilidades guardadas."
