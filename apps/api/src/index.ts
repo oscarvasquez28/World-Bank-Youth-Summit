@@ -51,9 +51,10 @@ app.post('/analyze', async (req, res) => {
 
 				// Expected structure: { results: [ { text: string, skills: [ { raw, mapped } ] } ] }
 				if (json && Array.isArray(json.results) && json.results[0] && Array.isArray(json.results[0].skills)) {
-					const mapped = json.results[0].skills
+					const mapped: string[] = json.results[0].skills
 						.map((s: any) => (s && (s.mapped || s.raw) ? (s.mapped || s.raw) : null))
 						.filter(Boolean)
+						.map((s: any) => String(s))
 						.slice(0, 8);
 
 						console.log('Model detected skills', mapped);
@@ -154,18 +155,32 @@ app.post('/lens', async (req, res) => {
 });
 
 // Simple in-memory user store (for demo / dev only)
-type User = { id: string; name?: string; email: string; password: string };
+type User = { id: string; name?: string; email: string; password: string; skills: string[] };
 const users: User[] = [];
+
+function normalizeSkillList(input: any): string[] {
+	if (!Array.isArray(input)) return [];
+	const normalized = input
+		.map((s) => titleCase(String(s || '').trim()))
+		.filter((s) => s.length > 0);
+	return Array.from(new Set(normalized));
+}
 
 app.post('/auth/register', (req, res) => {
 	try {
-		const { name, email, password } = req.body || {};
+		const { name, email, password, skills } = req.body || {};
 		if (!email || !password) return res.status(400).json({ error: 'email and password required' });
 
 		const exists = users.find((u) => u.email.toLowerCase() === String(email).toLowerCase());
 		if (exists) return res.status(409).json({ error: 'user already exists' });
 
-		const user: User = { id: randomUUID(), name: name || '', email: String(email), password: String(password) };
+		const user: User = {
+			id: randomUUID(),
+			name: name || '',
+			email: String(email),
+			password: String(password),
+			skills: normalizeSkillList(skills),
+		};
 		users.push(user);
 
 		// Return sanitized user
@@ -189,6 +204,42 @@ app.post('/auth/signin', (req, res) => {
 		res.json({ user: safe });
 	} catch (err) {
 		console.error('Error in /auth/signin', err);
+		res.status(500).json({ error: 'Internal server error' });
+	}
+});
+
+app.post('/auth/match', (req, res) => {
+	try {
+		const { requiredSkills } = req.body || {};
+		const required = normalizeSkillList(requiredSkills);
+
+		if (required.length === 0) {
+			return res.status(400).json({ error: 'requiredSkills is required' });
+		}
+
+		const matches = users
+			.map((u) => {
+				const userSkills = normalizeSkillList(u.skills);
+				const matchedSkills = required.filter((r) => userSkills.some((s) => s.toLowerCase() === r.toLowerCase()));
+				const missingSkills = required.filter((r) => !matchedSkills.some((m) => m.toLowerCase() === r.toLowerCase()));
+				const score = Math.round((matchedSkills.length / required.length) * 100);
+
+				return {
+					id: u.id,
+					name: u.name || u.email,
+					email: u.email,
+					skills: userSkills,
+					matchedSkills,
+					missingSkills,
+					score,
+				};
+			})
+			.filter((u) => u.matchedSkills.length > 0)
+			.sort((a, b) => b.score - a.score || b.matchedSkills.length - a.matchedSkills.length);
+
+		res.json({ requiredSkills: required, candidates: matches });
+	} catch (err) {
+		console.error('Error in /auth/match', err);
 		res.status(500).json({ error: 'Internal server error' });
 	}
 });
