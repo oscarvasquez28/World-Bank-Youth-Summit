@@ -45,6 +45,29 @@ class TestSkillsEndpoint:
         resp = client.post("/api/skills/extract", json={"texts": []})
         assert resp.status_code == 422  # validation error
 
+    def test_extract_skills_advanced_mapping(self):
+        resp = client.post(
+            "/api/skills/extract",
+            json={
+                "texts": [
+                    "I know how to handle customer requests related to cargo",
+                    "I have experience in writing database queries"
+                ]
+            }
+        )
+        assert resp.status_code == 200
+        body = resp.json()
+        results = body["results"]
+        
+        # Verify exact string match
+        cargo_mapped = [s["mapped"] for s in results[0]["skills"]]
+        assert "handle customer requests related to cargo" in cargo_mapped
+        
+        # Verify semantic mapping
+        db_mapped = [s["mapped"] for s in results[1]["skills"]]
+        assert "using database query language" in db_mapped
+
+
 
 # ---------------------------------------------------------------------------
 # Risk endpoint
@@ -68,6 +91,25 @@ class TestRiskEndpoint:
             json={"country_code": "X"},  # too short
         )
         assert resp.status_code == 422
+
+    def test_risk_lens_returns_200(self):
+        resp = client.post(
+            "/api/risk/lens",
+            json={
+                "country_code": "KEN",
+                "skills_profile": [
+                    "theatre techniques", "strategic planning", "data entry", "typing"
+                ]
+            }
+        )
+        assert resp.status_code == 200
+        body = resp.json()
+        assert "skills_at_risk" in body
+        assert "durable_skills" in body
+        assert "resilience_pathways" in body
+        assert "market_context" in body
+        assert isinstance(body["durable_skills"], list)
+
 
 
 # ---------------------------------------------------------------------------
