@@ -77,4 +77,64 @@ export function appendDetectedOpportunities(newOps: { role: string }[]) {
   }
 }
 
-export default { getDetectedSkills, setDetectedSkills, appendDetectedSkills, getDetectedOpportunities, setDetectedOpportunities, appendDetectedOpportunities };
+// ── Matching Occupations (keyed by skill → { [occupationName]: info }) ─────
+
+export type OccupationInfo = {
+  matching_skills?: string[];
+  missing_essential_skills?: string[];
+  description?: string;
+  matching_percentage?: number;
+  opportunity_type?: string;
+  isced_level?: number;
+  sector_growth?: number | null;
+  wage_signal?: number | null;
+};
+
+export type OccupationsMap = Record<string, Record<string, OccupationInfo>>;
+
+export function getOccupationsBySkill(): OccupationsMap {
+  try {
+    const raw =
+      localStorage.getItem(keyFor('occupationsBySkill')) ||
+      localStorage.getItem('occupationsBySkill');
+    const parsed = raw ? JSON.parse(raw) : {};
+    return parsed && typeof parsed === 'object' ? (parsed as OccupationsMap) : {};
+  } catch (e) {
+    return {};
+  }
+}
+
+export function setOccupationsBySkill(map: OccupationsMap) {
+  try {
+    localStorage.setItem(keyFor('occupationsBySkill'), JSON.stringify(map || {}));
+  } catch (e) {
+    console.warn('setOccupationsBySkill failed', e);
+  }
+}
+
+export function mergeOccupationsBySkill(partial: OccupationsMap): OccupationsMap {
+  try {
+    const cur = getOccupationsBySkill();
+    const merged: OccupationsMap = { ...cur };
+    Object.entries(partial || {}).forEach(([skill, occs]) => {
+      merged[skill] = { ...(cur[skill] || {}), ...(occs || {}) };
+    });
+    localStorage.setItem(keyFor('occupationsBySkill'), JSON.stringify(merged));
+    return merged;
+  } catch (e) {
+    console.warn('mergeOccupationsBySkill failed', e);
+    return partial;
+  }
+}
+
+export default {
+  getDetectedSkills,
+  setDetectedSkills,
+  appendDetectedSkills,
+  getDetectedOpportunities,
+  setDetectedOpportunities,
+  appendDetectedOpportunities,
+  getOccupationsBySkill,
+  setOccupationsBySkill,
+  mergeOccupationsBySkill,
+};

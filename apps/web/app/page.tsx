@@ -6,6 +6,7 @@ import Results from "../components/Results";
 import Spinner from "@/components/ui/spinner";
 import { motion } from 'framer-motion';
 import storage from '@/lib/storage';
+import { indexOccupationsBySkill } from '@/lib/occupations';
 import api from "@/lib/api";
 import "@/lib/api.routes";
 import { useI18n } from '@/lib/i18n'
@@ -80,6 +81,12 @@ export default function Home() {
           top_n: 10,
         });
         setOccupationsData(occupations || null);
+        try {
+          const map = indexOccupationsBySkill(occupations as any, detectedRaw);
+          if (Object.keys(map).length > 0) storage.mergeOccupationsBySkill(map);
+        } catch (e) {
+          console.warn('Failed to persist occupations to storage', e);
+        }
       } catch (e) {
         console.warn('Failed to fetch occupations data (mock)', e);
         setOccupationsData(null);
@@ -140,6 +147,12 @@ export default function Home() {
           top_n: 10,
         });
         setOccupationsData(occupations || null);
+        try {
+          const map = indexOccupationsBySkill(occupations as any, detectedRaw);
+          if (Object.keys(map).length > 0) storage.mergeOccupationsBySkill(map);
+        } catch (e) {
+          console.warn('Failed to persist occupations to storage', e);
+        }
       } catch (e) {
         console.warn('Failed to fetch occupations data', e);
         setOccupationsData(null);
