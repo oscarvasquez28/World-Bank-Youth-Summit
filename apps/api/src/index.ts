@@ -195,6 +195,7 @@ app.post('/occupations', async (req, res) => {
 				headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
 				body: JSON.stringify({
 					skills,
+					country_code,
 					locale: country_code,
 					top_n,
 				}),
