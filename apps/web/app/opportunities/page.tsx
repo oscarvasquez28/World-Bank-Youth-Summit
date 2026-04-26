@@ -72,25 +72,34 @@ export default function OpportunitiesPage() {
                   const selected = selectedSkills.length > 0 ? selectedSkills : skills;
                   const groups: Record<string, { role: string; salary: string }[]> = {};
 
+                  function escapeRegExp(str: string) {
+                    return str.replace(/[.*+?^${}()|[\\]\\]/g, "\\$&");
+                  }
+
                   // initialize groups for selected skills
                   selected.forEach((s) => (groups[s] = []));
 
-                  // assign opportunities to matching skill groups by checking role text
-                  opportunities.forEach((o) => {
-                    const matched = selected.find((s) => o.role.toLowerCase().includes(s.toLowerCase()));
-                    if (matched) groups[matched].push(o);
-                    else {
-                      // put into an 'Other' group
-                      groups['Other'] = groups['Other'] || [];
-                      groups['Other'].push(o);
-                    }
+                  // For each skill, match opportunities by whole-word match to avoid substring collisions
+                  const matchedSet = new Set<string>();
+                  selected.forEach((s) => {
+                    const pattern = new RegExp("\\b" + escapeRegExp(s) + "\\b", "i");
+                    opportunities.forEach((o) => {
+                      if (pattern.test(o.role)) {
+                        groups[s].push(o);
+                        matchedSet.add(o.role + '||' + o.salary);
+                      }
+                    });
                   });
+
+                  // collect unmatched opportunities into Other
+                  const other = opportunities.filter((o) => !matchedSet.has(o.role + '||' + o.salary));
+                  if (other.length > 0) groups['Other'] = other;
 
                   if (selected.length === 0 && opportunities.length === 0) {
                     return <p className="text-sm text-zinc-500">No opportunities yet.</p>;
                   }
 
-                  // when no filter, show per-skill groups for all skills
+                  // when no selection, show per-skill groups for all skills
                   const keys = selected.length > 0 ? selected : skills.length > 0 ? skills : [];
 
                   return (
@@ -98,21 +107,20 @@ export default function OpportunitiesPage() {
                       {keys.map((skill) => (
                         <motion.div key={skill} initial={{ opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }}>
                           <h2 className="mb-3 text-lg font-semibold">Opportunities for {skill}</h2>
-                          {(groups[skill] || []).length > 0 && (
-                            <div className="grid gap-4 md:grid-cols-2">
-                              {(groups[skill] || []).map((o) => (
-                                <Card key={o.role} className="p-4">
-                                  <div className="flex items-start justify-between gap-4">
-                                    <div>
-                                      <div className="text-sm font-semibold">{o.role}</div>
-                                      <div className="mt-1 text-sm text-zinc-600">{o.salary}</div>
-                                    </div>
+                          <div className="grid gap-4 md:grid-cols-2">
+                            {(groups[skill] || []).map((o) => (
+                              <Card key={o.role + '|' + o.salary} className="p-4">
+                                <div className="flex items-start justify-between gap-4">
+                                  <div>
+                                    <div className="text-sm font-semibold">{o.role}</div>
+                                    <div className="mt-1 text-sm text-zinc-600">{o.salary}</div>
                                   </div>
-                                  <div className="text-sm text-zinc-500 mt-2">Brief description placeholder for the role.</div>
-                                </Card>
-                              ))}
-                            </div>
-                          )}
+                                </div>
+                                <div className="text-sm text-zinc-500 mt-2">Brief description placeholder for the role.</div>
+                              </Card>
+                            ))}
+                            {(groups[skill] || []).length === 0 && <p className="text-sm text-zinc-500">No opportunities for this skill.</p>}
+                          </div>
                         </motion.div>
                       ))}
 
@@ -121,7 +129,7 @@ export default function OpportunitiesPage() {
                           <h2 className="mb-3 text-lg font-semibold">Other Opportunities</h2>
                           <div className="grid gap-4 md:grid-cols-2">
                             {groups['Other'].map((o) => (
-                              <Card key={o.role} className="p-4">
+                              <Card key={o.role + '|' + o.salary} className="p-4">
                                 <div className="flex items-start justify-between gap-4">
                                   <div>
                                     <div className="text-sm font-semibold">{o.role}</div>
