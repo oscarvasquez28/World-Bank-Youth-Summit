@@ -6,11 +6,18 @@ import { usePathname } from "next/navigation";
 import Avatar from "@/components/ui/avatar";
 import { toast } from 'sonner';
 import { initTheme, getStoredTheme, setTheme, toggleTheme, onThemeChange } from '@/lib/theme'
+import { useI18n } from '@/lib/i18n'
 
 export default function Navbar() {
   const pathname = usePathname();
   const [user, setUser] = useState<any>(null);
   const [theme, setThemeState] = useState<'light'|'dark'|'system'>('system')
+  const { t } = useI18n();
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   useEffect(() => {
     let mounted = true;
@@ -48,9 +55,9 @@ export default function Navbar() {
           </svg>
         </div>
         <nav className="hidden sm:flex flex-1 justify-center items-center gap-6 text-sm">
-          <Link className={`${pathname === '/' ? 'text-indigo-500 font-medium' : 'text-zinc-700 dark:text-zinc-300'}`} href="/">Discover</Link>
-          <Link className={`${pathname === '/opportunities' ? 'text-indigo-500 font-medium' : 'text-zinc-700 dark:text-zinc-300'}`} href="/opportunities">Opportunities</Link>
-          <Link className={`${pathname === '/for-companies' ? 'text-indigo-500 font-medium' : 'text-zinc-700 dark:text-zinc-300'}`} href="#">For Companies</Link>
+          <Link className={`${pathname === '/' ? 'text-indigo-500 font-medium' : 'text-zinc-700 dark:text-zinc-300'}`} href="/">{mounted ? t('nav.discover') : ''}</Link>
+          <Link className={`${pathname === '/opportunities' ? 'text-indigo-500 font-medium' : 'text-zinc-700 dark:text-zinc-300'}`} href="/opportunities">{mounted ? t('nav.opportunities') : ''}</Link>
+          <Link className={`${pathname === '/for-companies' ? 'text-indigo-500 font-medium' : 'text-zinc-700 dark:text-zinc-300'}`} href="#">{mounted ? t('nav.for_companies') : ''}</Link>
         </nav>
         <div className="hidden sm:flex items-center gap-4">
           <button
@@ -70,6 +77,8 @@ export default function Navbar() {
             )}
           </button>
 
+          <LanguageMenu />
+
           <ProfileMenu user={user} onSignOut={() => {
             import('@/lib/auth').then((a) => a.clearUser());
           }} />
@@ -78,8 +87,29 @@ export default function Navbar() {
     </header>
   );
 }
+function LanguageMenu() {
+  const { locale, setLocale } = useI18n();
+
+  return (
+    <select
+      aria-label="Language"
+      value={locale}
+      onChange={(e) => {
+        const v = e.target.value as any;
+        setLocale(v);
+        // reload so server can render the chosen locale (cookie is written in provider)
+        try { window.location.reload(); } catch (e) { /* ignore */ }
+      }}
+      className="h-9 rounded-md bg-zinc-100 text-sm text-zinc-700 dark:bg-zinc-800 dark:text-zinc-200 px-2"
+    >
+      <option value="en">EN</option>
+      <option value="es">ES</option>
+    </select>
+  );
+}
 function ProfileMenu({ user, onSignOut } : { user: any | null; onSignOut: () => void; }) {
   const [open, setOpen] = useState(false);
+  const { t } = useI18n();
 
   return (
     <div className="relative">
@@ -97,7 +127,7 @@ function ProfileMenu({ user, onSignOut } : { user: any | null; onSignOut: () => 
       {open && (
         <div className="absolute right-0 z-50 mt-2 w-64 rounded-md border bg-white shadow-lg dark:bg-zinc-900 dark:border-neutral-700">
           {!user && (
-            <a href="/signin" className="block px-4 py-2 text-sm text-zinc-700 hover:bg-zinc-50">Sign in</a>
+            <a href="/signin" className="block px-4 py-2 text-sm text-zinc-700 hover:bg-zinc-50">{t('auth.sign_in')}</a>
           )}
 
           {user && (
@@ -113,7 +143,7 @@ function ProfileMenu({ user, onSignOut } : { user: any | null; onSignOut: () => 
               </div>
 
               <div className="px-2 py-2">
-                <button onClick={async () => { onSignOut(); toast('Signed out'); setOpen(false); }} className="w-full rounded px-3 py-2 text-sm text-zinc-700 dark:text-zinc-200 hover:bg-zinc-50 dark:hover:bg-zinc-800 text-left">Sign out</button>
+                <button onClick={async () => { onSignOut(); toast(t('auth.signed_out')); setOpen(false); }} className="w-full rounded px-3 py-2 text-sm text-zinc-700 dark:text-zinc-200 hover:bg-zinc-50 dark:hover:bg-zinc-800 text-left">{t('auth.sign_out')}</button>
               </div>
             </div>
           )}
