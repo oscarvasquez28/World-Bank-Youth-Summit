@@ -69,9 +69,6 @@ app.post('/analyze', async (req, res) => {
 			console.warn('Failed to call external skills model, falling back to tokenization', e);
 		}
 
-		// Normalize detected skill strings to Title Case before returning
-		detected = detected.map(titleCase);
-
 		const opportunities = detected.slice(0, 4).map((s) => ({
 			role: String(s),
 			salary: country === 'US' ? '$60k - $95k' : '$20k - $40k',
@@ -91,7 +88,7 @@ app.post('/lens', async (req, res) => {
 
 		const body = req.body && typeof req.body === 'object' ? req.body : {};
 		const skills = Array.isArray((body as any).skills) ? (body as any).skills : [];
-		const countryInput = (body as any).country_code || (body as any).country || 'USA';
+		const countryInput = (body as any).country_code || (body as any).country || (body as any).locale || 'USA';
 
 		// normalize to ISO-3166 alpha-3 where possible (best-effort)
 		const countryMap: Record<string, string> = {
@@ -150,6 +147,75 @@ app.post('/lens', async (req, res) => {
 		}
 	} catch (err) {
 		console.error('Error in /lens handler', err);
+		res.status(500).json({ error: 'Internal server error' });
+	}
+});
+
+// POST /occupations: forward skills + country to occupations model endpoint
+app.post('/occupations', async (req, res) => {
+	try {
+		console.log('POST /occupations', { body: req.body });
+
+		const body = req.body && typeof req.body === 'object' ? req.body : {};
+		const skills = Array.isArray((body as any).skills) ? (body as any).skills : [];
+		const countryInput = (body as any).country_code || (body as any).country || 'USA';
+
+		// normalize to ISO-3166 alpha-3 where possible (best-effort)
+		const countryMap: Record<string, string> = {
+			US: 'USA',
+			MX: 'MEX',
+			GB: 'GBR',
+			UK: 'GBR',
+			CA: 'CAN',
+			FR: 'FRA',
+			DE: 'DEU',
+			CN: 'CHN',
+			IN: 'IND',
+			BR: 'BRA',
+			ES: 'ESP',
+			IT: 'ITA',
+			AU: 'AUS',
+		};
+
+		let country_code = String(countryInput || 'USA').trim();
+		if (country_code.length === 2) {
+			country_code = countryMap[country_code.toUpperCase()] || country_code.toUpperCase();
+		} else if (country_code.length > 3) {
+			country_code = country_code.slice(0, 3).toUpperCase();
+		} else {
+			country_code = country_code.toUpperCase();
+		}
+
+		const top_n_input = (body as any).top_n ?? (body as any).topN;
+		const top_n = Number.isFinite(Number(top_n_input)) ? Number(top_n_input) : 10;
+
+		try {
+			const modelRes = await fetch('http://127.0.0.1:8000/api/risk/occupations', {
+				method: 'POST',
+				headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+				body: JSON.stringify({
+					skills,
+					country_code,
+					locale: country_code,
+					top_n,
+				}),
+			});
+
+			if (!modelRes.ok) {
+				const t = await modelRes.text().catch(() => '');
+				console.warn('Occupations model returned non-ok status', modelRes.status, t);
+				return res.status(502).json({ error: 'Occupations model error', status: modelRes.status, body: t });
+			}
+
+			const json = await modelRes.json();
+			const out = json && typeof json === 'object' ? json : {};
+			return res.json(out);
+		} catch (e) {
+			console.error('Failed to call occupations model', e);
+			return res.status(502).json({ error: 'Failed to call occupations model', message: String(e) });
+		}
+	} catch (err) {
+		console.error('Error in /occupations handler', err);
 		res.status(500).json({ error: 'Internal server error' });
 	}
 });

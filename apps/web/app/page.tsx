@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from "react";
 import SkillInput from "@/components/SkillInput";
-import Results from "@/components/Results";
+import Results from "../components/Results";
 import Spinner from "@/components/ui/spinner";
 import { motion } from 'framer-motion';
 import storage from '@/lib/storage';
@@ -24,6 +24,7 @@ export default function Home() {
   const [currentSkills, setCurrentSkills] = useState<string[]>([]);
   const [currentOpportunities, setCurrentOpportunities] = useState<{ role: string; salary?: string }[]>([]);
   const [lensData, setLensData] = useState<any | null>(null);
+  const [occupationsData, setOccupationsData] = useState<Record<string, any> | null>(null);
   const [credentialData, setCredentialData] = useState<any | null>(null);
   const [error, setError] = useState<string | null>(null);
 
@@ -51,21 +52,19 @@ export default function Home() {
         .filter((t) => t.length > 2)
         .slice(0, 8);
 
-      let detected = Array.from(new Set(tokens)).slice(0, 8);
-      detected = detected.map(titleCase);
-
-      const opps = detected.slice(0, 4).map((s, i) => ({
+      const detectedRaw = Array.from(new Set(tokens)).slice(0, 8);
+      const opps = detectedRaw.slice(0, 4).map((s) => ({
         role: String(s),
         salary: country === "US" ? "$60k - $95k" : "$20k - $40k",
       }));
 
       // set current results for the Results panel (only show these on Discover)
-      setCurrentSkills(detected);
+      setCurrentSkills(detectedRaw);
       setCurrentOpportunities(opps);
 
       // call lens endpoint with detected skills (best-effort)
       try {
-        const lens = await api.lens({ skills: detected, country });
+        const lens = await api.lens({ skills: detectedRaw, country });
         setLensData(lens);
         setCredentialData(lens?.credential || lens?.passport || lens?.jsonld || (Array.isArray(lens?.credentials) ? lens.credentials[0] : null) || null);
       } catch (e) {
@@ -74,10 +73,22 @@ export default function Home() {
         setCredentialData(null);
       }
 
+      try {
+        const occupations = await api.occupations({
+          skills: detectedRaw,
+          country,
+          top_n: 10,
+        });
+        setOccupationsData(occupations || null);
+      } catch (e) {
+        console.warn('Failed to fetch occupations data (mock)', e);
+        setOccupationsData(null);
+      }
+
       setSkills((prev) => {
-        const merged = Array.from(new Set([...prev, ...detected]));
+        const merged = Array.from(new Set([...prev, ...detectedRaw]));
         try {
-          storage.appendDetectedSkills(detected);
+          storage.appendDetectedSkills(detectedRaw);
         } catch (e) {
           console.warn('Failed to append detected skills to storage', e);
         }
@@ -102,20 +113,19 @@ export default function Home() {
     setError(null);
     try {
       const data = await api.analyze({ text, country });
-      let detected = data.skills || [];
-      detected = detected.map(titleCase);
+      const detectedRaw: string[] = Array.isArray(data.skills) ? data.skills : [];
       const opps: { role: string; salary?: string }[] = data.opportunities || [];
 
       // Analyze may also return JSON-LD credential payloads in some deployments.
       setCredentialData(data?.credential || data?.passport || data?.jsonld || (Array.isArray(data?.credentials) ? data.credentials[0] : null) || null);
 
       // current results - only these should be shown on Discover
-      setCurrentSkills(detected);
+      setCurrentSkills(detectedRaw);
       setCurrentOpportunities(opps);
       
       // call lens endpoint with detected skills (real API path)
       try {
-        const lens = await api.lens({ skills: detected, country });
+        const lens = await api.lens({ skills: detectedRaw, country });
         setLensData(lens);
         setCredentialData((prev: any) => prev || lens?.credential || lens?.passport || lens?.jsonld || (Array.isArray(lens?.credentials) ? lens.credentials[0] : null) || null);
       } catch (e) {
@@ -123,10 +133,22 @@ export default function Home() {
         setLensData(null);
       }
 
+      try {
+        const occupations = await api.occupations({
+          skills: detectedRaw,
+          country,
+          top_n: 10,
+        });
+        setOccupationsData(occupations || null);
+      } catch (e) {
+        console.warn('Failed to fetch occupations data', e);
+        setOccupationsData(null);
+      }
+
       setSkills((prev) => {
-        const merged = Array.from(new Set([...prev, ...detected]));
+        const merged = Array.from(new Set([...prev, ...detectedRaw]));
         try {
-          storage.appendDetectedSkills(detected);
+          storage.appendDetectedSkills(detectedRaw);
         } catch (e) {
           console.warn('Failed to append detected skills to storage', e);
         }
@@ -185,7 +207,13 @@ export default function Home() {
 
         {!loading && (currentSkills.length > 0 || currentOpportunities.length > 0) && (
           <div className="mt-8">
-            <Results skills={currentSkills} opportunities={currentOpportunities} lens={lensData} credential={credentialData} />
+            <Results
+              skills={currentSkills}
+              opportunities={currentOpportunities}
+              lens={lensData}
+              occupations={occupationsData}
+              credential={credentialData}
+            />
           </div>
         )}
       </main>

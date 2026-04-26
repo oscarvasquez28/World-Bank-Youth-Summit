@@ -14,10 +14,7 @@ export function getDetectedSkills(): string[] {
   try {
     const raw = localStorage.getItem(keyFor('detectedSkills')) || localStorage.getItem('detectedSkills');
     const arr = raw ? JSON.parse(raw) : [];
-    // normalize to Title Case
-    return Array.isArray(arr)
-      ? arr.map((v: any) => String(v || '').toLowerCase().replace(/\b\w/g, (c) => c.toUpperCase()))
-      : [];
+    return Array.isArray(arr) ? arr.map((v: any) => String(v || '')) : [];
   } catch (e) {
     return [];
   }
@@ -48,13 +45,7 @@ export function getDetectedOpportunities(): { role: string }[] {
     const raw = localStorage.getItem(keyFor('detectedOpportunities')) || localStorage.getItem('detectedOpportunities');
     const arr = raw ? JSON.parse(raw) : [];
     if (!Array.isArray(arr)) return [];
-    return arr.map((o: any) => {
-      const roleRaw = String((o && o.role) || '');
-      // remove trailing 'Specialist' if present and normalize to Title Case
-      const withoutSpecialist = roleRaw.replace(/\s*Specialist$/i, '');
-      const role = withoutSpecialist.toLowerCase().replace(/\b\w/g, (c) => c.toUpperCase());
-      return { role };
-    });
+    return arr.map((o: any) => ({ role: String((o && o.role) || '') }));
   } catch (e) {
     return [];
   }
@@ -71,13 +62,7 @@ export function setDetectedOpportunities(arr: { role: string }[]) {
 export function appendDetectedOpportunities(newOps: { role: string }[]) {
   try {
     const cur = getDetectedOpportunities();
-    // normalize incoming
-    const normalized = (newOps || []).map((o) => {
-      const roleRaw = String((o && o.role) || '');
-      const withoutSpecialist = roleRaw.replace(/\s*Specialist$/i, '');
-      const role = withoutSpecialist.toLowerCase().replace(/\b\w/g, (c) => c.toUpperCase());
-      return { role };
-    });
+    const normalized = (newOps || []).map((o) => ({ role: String((o && o.role) || '') }));
 
     // merge and dedupe by role
     const map = new Map<string, { role: string }>();
