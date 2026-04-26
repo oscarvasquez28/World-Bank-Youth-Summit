@@ -12,8 +12,18 @@ export default function RegisterPage() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirm, setConfirm] = useState("");
+  const [skillsText, setSkillsText] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+
+  const parseSkills = (text: string) => Array.from(
+    new Set(
+      text
+        .split(/[,\n]+/)
+        .map((s) => s.trim())
+        .filter(Boolean)
+    )
+  );
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -32,7 +42,7 @@ export default function RegisterPage() {
       const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:3001'}/auth/register`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ name, email, password }),
+        body: JSON.stringify({ name, email, password, skills: parseSkills(skillsText) }),
       });
 
       const data = await res.json();
@@ -106,6 +116,16 @@ export default function RegisterPage() {
               onChange={(e) => setConfirm(e.target.value)}
               className="w-full rounded-md border px-3 py-2 text-sm shadow-sm"
               placeholder="••••••••"
+            />
+          </div>
+
+          <div>
+            <label className="mb-2 block text-sm font-medium">Skills (comma-separated)</label>
+            <textarea
+              value={skillsText}
+              onChange={(e) => setSkillsText(e.target.value)}
+              className="w-full rounded-md border px-3 py-2 text-sm shadow-sm min-h-[84px]"
+              placeholder="Excel, Customer Service, Data Analysis"
             />
           </div>
 

@@ -57,7 +57,7 @@ export default function Navbar() {
         <nav className="hidden sm:flex flex-1 justify-center items-center gap-6 text-sm">
           <Link className={`${pathname === '/' ? 'text-indigo-500 font-medium' : 'text-zinc-700 dark:text-zinc-300'}`} href="/">{mounted ? t('nav.discover') : ''}</Link>
           <Link className={`${pathname === '/opportunities' ? 'text-indigo-500 font-medium' : 'text-zinc-700 dark:text-zinc-300'}`} href="/opportunities">{mounted ? t('nav.opportunities') : ''}</Link>
-          <Link className={`${pathname === '/for-companies' ? 'text-indigo-500 font-medium' : 'text-zinc-700 dark:text-zinc-300'}`} href="#">{mounted ? t('nav.for_companies') : ''}</Link>
+          <Link className={`${pathname === '/for-companies' ? 'text-indigo-500 font-medium' : 'text-zinc-700 dark:text-zinc-300'}`} href="/for-companies">{mounted ? t('nav.for_companies') : ''}</Link>
         </nav>
         <div className="hidden sm:flex items-center gap-4">
           <button
