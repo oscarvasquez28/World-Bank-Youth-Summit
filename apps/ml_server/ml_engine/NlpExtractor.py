@@ -52,19 +52,57 @@ def extract_skills(texts: list[str]) -> list[dict[str, Any]]:
         - ``skills``      : list of dicts with ``raw`` (surface form) and
                             ``mapped`` (ESCO taxonomy label) keys
     """
+    from ml_engine.SkillAssessor import LABEL_TO_URI
+    
+    # Pre-compute lowercase labels for fast exact matching
+    lowercase_to_label = {
+        label.lower(): label 
+        for label in LABEL_TO_URI.keys() 
+        if isinstance(label, str)
+    }
+
     docs = skills_extractor(texts)
 
     results: list[dict[str, Any]] = []
     for original_text, doc in zip(texts, docs):
         skills_found: list[dict[str, str]] = []
-        for ent in doc.ents:
-            mapped = getattr(ent._, "mapped_skill", None)
+        
+        # 1. Exact String Match Augmentation
+        text_lower = original_text.lower()
+        for lower_label, exact_label in lowercase_to_label.items():
+            if len(lower_label) > 4 and lower_label in text_lower:
+                skills_found.append({
+                    "raw": exact_label,
+                    "mapped": exact_label
+                })
+                
+        # 2. NLP Model Extraction and Mapping
+        spans = getattr(doc._, "skill_spans", [])
+        mapped_skills = getattr(doc._, "mapped_skills", [])
+        
+        for s, m in zip(spans, mapped_skills):
+            span_text = s if isinstance(s, str) else getattr(s, "text", str(s))
+            
+            # The mapper returns a dict with 'match_skill' if semantic mapping succeeded
+            mapped_label = span_text
+            if isinstance(m, dict) and "match_skill" in m:
+                mapped_label = m["match_skill"]
+                
             skills_found.append(
                 {
-                    "raw": ent.text,
-                    "mapped": mapped if mapped else ent.text,
+                    "raw": span_text,
+                    "mapped": mapped_label,
                 }
             )
-        results.append({"text": original_text, "skills": skills_found})
+            
+        # Deduplicate results (exact matches might overlap with NLP matches)
+        unique_skills = []
+        seen_mapped = set()
+        for sf in skills_found:
+            if sf["mapped"] not in seen_mapped:
+                seen_mapped.add(sf["mapped"])
+                unique_skills.append(sf)
+
+        results.append({"text": original_text, "skills": unique_skills})
 
     return results

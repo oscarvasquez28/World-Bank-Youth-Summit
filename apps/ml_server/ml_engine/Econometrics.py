@@ -12,8 +12,19 @@ from typing import Any
 
 import pandas as pd
 import wbgapi as wb
+from pathlib import Path
 
 logger = logging.getLogger(__name__)
+
+# ---------------------------------------------------------------------------
+# Global datasets
+# ---------------------------------------------------------------------------
+DATA_DIR = Path(__file__).parent.parent / "local_models" / "training_data"
+try:
+    WCDE_DATA = pd.read_csv(DATA_DIR / "wcde_data.csv", skiprows=8)
+except Exception as e:
+    logger.error(f"Failed to load wcde_data.csv: {e}")
+    WCDE_DATA = pd.DataFrame()
 
 # ---------------------------------------------------------------------------
 # Indicator codes (World Development Indicators – WDI)
@@ -79,6 +90,42 @@ def fetch_country_indicators(country_code: str) -> dict[str, Any]:
         result[friendly_name] = value
 
     return result
+
+
+def fetch_education_projections(country_code: str) -> dict[str, Any]:
+    """
+    Query the projected educational shifts for a given country using the Wittgenstein dataset.
+    """
+    if WCDE_DATA.empty:
+        return {}
+        
+    try:
+        economy_info = wb.economy.get(country_code)
+        country_name = economy_info.get("value")
+        if not country_name:
+            return {}
+    except Exception as e:
+        logger.error(f"Failed to resolve country code {country_code} for Wittgenstein: {e}")
+        return {}
+        
+    # Filter dataset for the country and focus on projections (e.g. 2025-2035)
+    # The dataset contains "Area", "Year", "Age", "Education", "Distribution"
+    df = WCDE_DATA[(WCDE_DATA["Area"] == country_name) & (WCDE_DATA["Year"].isin([2025, 2030, 2035]))]
+    
+    if df.empty:
+        return {}
+        
+    # Summarize distribution across education levels by year
+    # We will average over Age groups to give a broad picture
+    summary = df.groupby(["Year", "Education"])["Distribution"].mean().reset_index()
+    
+    # Format as nested dict: {2025: {"Under 15": X, "Upper Secondary": Y}, 2030: ...}
+    projections = {}
+    for year in sorted(summary["Year"].unique()):
+        year_data = summary[summary["Year"] == year]
+        projections[str(year)] = dict(zip(year_data["Education"], year_data["Distribution"]))
+        
+    return {"country": country_name, "projections": projections}
 
 
 def build_feature_vector(indicators: dict[str, Any]) -> list[float]:

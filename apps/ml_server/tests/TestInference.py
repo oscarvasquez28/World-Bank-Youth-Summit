@@ -67,6 +67,20 @@ class TestRiskInference:
         assert isinstance(result["indicators"], dict)
         assert len(result["indicators"]) > 0
 
+    def test_evaluate_skills_risk_with_alt_labels(self):
+        from ml_engine.SkillAssessor import evaluate_skills_risk
+        from ml_engine.Econometrics import fetch_country_indicators
+
+        indicators = fetch_country_indicators("KEN")
+        # "use mathematical tools and equipment" is the preferredLabel
+        # "use calculator" is an altLabel
+        at_risk, durable = evaluate_skills_risk(indicators, ["use calculator", "use mathematical tools and equipment"])
+        
+        # They should both resolve to the exact same risk score
+        assert len(durable) == 2
+        assert durable[0]["risk_score"] == durable[1]["risk_score"]
+
+
 
 # ---------------------------------------------------------------------------
 # Econometrics feature vector

@@ -2,7 +2,7 @@
 Gradient 4,4132,Data Entry Clerks,0.7,0.03
 Gradient 4,4131,Typists and Word Processing Operators,0.65,0.05
 Gradient 4,4311,Accounting and Bookkeeping Clerks,0.64,0.07
-Gradient 4,4312,Statistical, Finance and Insurance Clerks,0.64,0.02
+Gradient 4,4312,Statistical Finance and Insurance Clerks,0.64,0.02
 Gradient 4,3311,Securities and Finance Dealers and Brokers,0.63,0.04
 Gradient 4,4419,Clerical Support Workers Not Elsewhere Classified,0.63,0.03
 Gradient 4,2413,Financial Analysts,0.62,0.06
@@ -12,7 +12,7 @@ Gradient 4,2513,Web and Multimedia Developers,0.6,0.08
 Gradient 4,3312,Credit and Loans Officers,0.6,0.04
 Gradient 4,4110,General Office Clerks,0.6,0.1
 Gradient 4,4416,Personnel Clerks,0.6,0.09
-Gradient 3,2643,Translators, Interpreters and Other Linguists,0.59,0.11
+Gradient 3,2643,Translators Interpreters and Other Linguists,0.59,0.11
 Gradient 3,4120,Secretaries (general),0.58,0.1
 Gradient 3,4211,Bank Tellers and Related Clerks,0.58,0.09
 Gradient 3,4222,Contact Centre Information Clerks,0.58,0.06
@@ -21,11 +21,11 @@ Gradient 3,2412,Financial and Investment Advisers,0.57,0.11
 Gradient 3,2514,Applications Programmers,0.57,0.08
 Gradient 3,2521,Database Designers and Administrators,0.57,0.08
 Gradient 3,2522,Systems Aministrators,0.57,0.05
-Gradient 3,3314,Statistical, Mathematical and Related Associate Professionals,0.57,0.1
+Gradient 3,3314,Statistical Mathematical and Related Associate Professionals,0.57,0.1
 Gradient 3,3331,Clearing and Forwarding Aents,0.57,0.09
 Gradient 3,4225,Inquiry Clerks,0.57,0.09
 Gradient 3,4226,Receptionists (general),0.57,0.17
-Gradient 3,2120,Mathematicians, Actuaries and Statisticians,0.56,0.09
+Gradient 3,2120,Mathematicians Actuaries and Statisticians,0.56,0.09
 Gradient 3,4221,Travel Consultants and Clerks,0.56,0.07
 Gradient 3,2431,Advertising and Marketing Professionals,0.55,0.09
 Gradient 3,2519,Software and Applications Developers and Analysts Not Elsewhere Classified,0.55,0.16
@@ -47,7 +47,7 @@ Gradient 3,3252,Medical Records and Health Information Technicians,0.52,0.1
 Gradient 3,2411,Accountants,0.51,0.08
 Gradient 3,2434,Information and Communications Technology Sales Professionals,0.51,0.09
 Gradient 3,4224,Hotel Receptionists,0.51,0.07
-Gradient 3,4413,Coding, Proofreading and Related Clerks,0.51,0.2
+Gradient 3,4413,Coding Proofreading and Related Clerks,0.51,0.2
 Gradient 3,2433,Technical and Medical Sales Professionals (excluding ICT),0.5,0.1
 Gradient 3,4323,Transport Clerks,0.5,0.1
 Gradient 2,2166,Graphic and Multimedia Designers,0.49,0.09
@@ -57,13 +57,13 @@ Gradient 2,3313,Accounting Associate Professionals,0.49,0.13
 Gradient 2,3322,Commercial Sales Representatives,0.49,0.08
 Gradient 2,3352,Government Tax and Excise Officials,0.49,0.12
 Gradient 2,2153,Telecommunications Engineers,0.48,0.12
-Gradient 2,2632,Sociologists, Anthropologists and Related Professionals,0.48,0.12
+Gradient 2,2632,Sociologists Anthropologists and Related Professionals,0.48,0.12
 Gradient 2,3332,Conference and Event Planners,0.48,0.14
 Gradient 2,4213,Pawnbrokers and Money-lenders,0.48,0.06
 Gradient 2,1346,Financial and Insurance Services Branch managers,0.47,0.12
 Gradient 2,2356,Information Technology Trainers,0.47,0.1
 Gradient 2,2621,Archivists and Curators,0.47,0.11
-Gradient 2,2633,Philosophers, Historians and Political Scientists,0.47,0.06
+Gradient 2,2633,Philosophers Historians and Political Scientists,0.47,0.06
 Gradient 2,2656,Announcers on Radio, Television and Other Media,0.47,0.12
 Gradient 2,3512,Information and Communications Technology User Support Technicians,0.47,0.19
 Gradient 2,2421,Management and Organization Analysts,0.46,0.1
@@ -72,7 +72,7 @@ Gradient 2,5243,Door-to-door Salespersons,0.46,0.18
 Gradient 2,2423,Personnel and Careers Professionals,0.45,0.07
 Gradient 2,3315,Valuers and Loss Assessors,0.45,0.19
 Gradient 2,3353,Government Social Benefits Officials,0.45,0.07
-Gradient 2,4212,Bookmakers, Croupiers and Related Gaming Workers,0.45,0.19
+Gradient 2,4212,Bookmakers Croupiers and Related Gaming Workers,0.45,0.19
 Gradient 2,1330,Information and Communications Technology Service Managers,0.44,0.07
 Gradient 2,1420,Retail and Wholesale Trade Managers,0.44,0.15
 Gradient 2,2165,Cartographers and Surveyors,0.44,0.12
@@ -93,7 +93,7 @@ Gradient 2,5242,Sales Demonstrators,0.42,0.11
 Gradient 2,1221,Sales and Marketing Managers,0.41,0.09
 Gradient 2,2424,Training and Staff Development Professionals,0.41,0.09
 Gradient 2,4412,Mail Carriers and Sorting Clerks,0.41,0.15
-Gradient 2,2131,Biologists, Botanists, Zoologists and Related Professionals,0.4,0.1
+Gradient 2,2131,Biologists Botanists Zoologists and Related Professionals,0.4,0.1
 Gradient 1,2351,Education Methods Specialists,0.39,0.11
 Gradient 1,2634,Psychologists,0.39,0.14
 Gradient 1,3411,Legal and Related Associate Professionals,0.39,0.14
@@ -105,12 +105,12 @@ Gradient 1,5223,Shop Sales Assistants,0.38,0.16
 Gradient 1,7321,Pre-press Technicians,0.38,0.22
 Gradient 1,9623,Meter Readers and Vending-machine Collectors,0.38,0.21
 Gradient 1,1411,Hotel Managers,0.37,0.13
-Gradient 1,3433,Gallery, Museum and Library Technicians,0.37,0.2
+Gradient 1,3433,Gallery Museum and Library Technicians,0.37,0.2
 Gradient 1,4415,Filing and Copying Clerks,0.37,0.17
-Gradient 1,9621,Messengers, Package Deliverers and Luggage Porters,0.37,0.19
+Gradient 1,9621,Messengers Package Deliverers and Luggage Porters,0.37,0.19
 Gradient 1,3256,Medical Assistants,0.35,0.23
 Gradient 1,5211,Stall and Market Salespersons,0.35,0.17
-Gradient 1,8322,Car, Taxi and Van Drivers,0.28,0.23
+Gradient 1,8322,Car Taxi and Van Drivers,0.28,0.23
 Minimal Exposure,3522,Telecommunications Engineering Technicians,0.45,0.04
 Minimal Exposure,2422,Policy Administration Professionals,0.42,0.06
 Minimal Exposure,2164,Town and Traffic Planners,0.41,0.06
@@ -123,7 +123,7 @@ Minimal Exposure,3333,Employment agents and contractors,0.39,0.09
 Minimal Exposure,1112,Senior Government Officials,0.38,0.08
 Minimal Exposure,1120,Managing Directors and Chief Executives,0.38,0.06
 Minimal Exposure,1321,Manufacturing Managers,0.38,0.11
-Minimal Exposure,1324,Supply, Distribution and Related Managers,0.38,0.05
+Minimal Exposure,1324,Supply Distribution and Related Managers,0.38,0.05
 Minimal Exposure,1349,Professional Services Managers Not Elsewhere Classified,0.38,0.07
 Minimal Exposure,2133,Environmental Protection Professionals,0.38,0.04
 Minimal Exposure,2143,Environmental Engineers,0.38,0.07
@@ -136,8 +136,8 @@ Minimal Exposure,2161,Building Architects,0.37,0.08
 Minimal Exposure,2162,Landscape Architects,0.37,0.08
 Minimal Exposure,2310,University and Higher Education Teachers,0.37,0.12
 Minimal Exposure,2619,Legal Professionals Not Elsewhere Classified,0.37,0.09
-Minimal Exposure,2654,Film, Stage and Related Directors and Producers,0.37,0.07
-Minimal Exposure,3422,Sports Coaches, Instructors and Officials,0.37,0.12
+Minimal Exposure,2654,Film Stage and Related Directors and Producers,0.37,0.07
+Minimal Exposure,3422,Sports Coaches Instructors and Officials,0.37,0.12
 Minimal Exposure,3432,Interior Designers and Decorators,0.37,0.08
 Minimal Exposure,4321,Stock Clerks,0.37,0.06
 Minimal Exposure,1212,Human Resource Managers,0.36,0.05
@@ -165,7 +165,7 @@ Minimal Exposure,3155,Air Traffic Safety Electronics Technicians,0.34,0.1
 Minimal Exposure,2262,Pharmacists,0.33,0.09
 Minimal Exposure,2359,Teaching Professionals Not Elsewhere Classified,0.33,0.1
 Minimal Exposure,3412,Social Work Associate Professionals,0.33,0.13
-Minimal Exposure,1431,Sports, Recreation and Cultural Centre Managers,0.32,0.1
+Minimal Exposure,1431,Sports Recreation and Cultural Centre Managers,0.32,0.1
 Minimal Exposure,2230,Traditional and Complementary Medicine Professionals,0.32,0.11
 Minimal Exposure,3351,Customs and Border Inspectors,0.32,0.14
 Minimal Exposure,5113,Travel Guides,0.32,0.11
@@ -204,8 +204,8 @@ Not Exposed,2612,Judges,0.31,0.08
 Not Exposed,2142,Civil Engineers,0.3,0.06
 Not Exposed,2149,Engineering Professionals Not Elsewhere Classified,0.3,0.08
 Not Exposed,2330,Secondary Education Teachers,0.3,0.07
-Not Exposed,2132,Farming, Forestry and Fisheries Advisers,0.29,0.1
-Not Exposed,2146,Mining Engineers, Metallurgists and Related Professionals,0.29,0.05
+Not Exposed,2132,Farming Forestry and Fisheries Advisers,0.29,0.1
+Not Exposed,2146,Mining Engineers Metallurgists and Related Professionals,0.29,0.05
 Not Exposed,2211,Generalist Medical Practitioners,0.29,0.1
 Not Exposed,3121,Mining Supervisors,0.29,0.08
 Not Exposed,3133,Chemical Processing Plant Controllers,0.29,0.1
@@ -214,7 +214,7 @@ Not Exposed,3152,Ships' Deck Officers and Pilots,0.29,0.11
 Not Exposed,2263,Environmental and Occupational Health and Hygiene Professionals,0.28,0.05
 Not Exposed,2352,Special Needs Teachers,0.28,0.1
 Not Exposed,2635,Social Work and Counselling Professionals,0.28,0.1
-Not Exposed,2652,Musicians, Singers and Composers,0.28,0.09
+Not Exposed,2652,Musicians Singers and Composers,0.28,0.09
 Not Exposed,3112,Civil Engineering Technicians,0.28,0.07
 Not Exposed,3117,Mining and metallurgical technicians,0.28,0.06
 Not Exposed,3123,Construction Supervisors,0.28,0.06
@@ -250,13 +250,13 @@ Not Exposed,2240,Paramedical Practitioners,0.23,0.13
 Not Exposed,3151,Ships' Engineers,0.23,0.05
 Not Exposed,3355,Police Inspectors and Detectives,0.23,0.07
 Not Exposed,3421,Athletes and Sports Players,0.23,0.11
-Not Exposed,8114,Cement, Stone and Other Mineral Products Machine Operators,0.23,0.11
+Not Exposed,8114,Cement Stone and Other Mineral Products Machine Operators,0.23,0.11
 Not Exposed,1312,Aquaculture and Fisheries Production Managers,0.22,0.08
 Not Exposed,3211,Medical Imaging and Therapeutic Equipment Technicians,0.22,0.03
 Not Exposed,3253,Community Health Workers,0.22,0.08
 Not Exposed,3258,Ambulance Workers,0.22,0.17
 Not Exposed,5111,Travel Attendants and Travel Stewards,0.22,0.1
-Not Exposed,5151,Cleaning and Housekeeping Supervisors in Offices, Hotels and Other Establishments,0.22,0.1
+Not Exposed,5151,Cleaning and Housekeeping Supervisors in Offices Hotels and Other Establishments,0.22,0.1
 Not Exposed,5162,Companions and Valets,0.22,0.05
 Not Exposed,5212,Street Food Salespersons,0.22,0.11
 Not Exposed,6123,Apiarists and Sericulturists,0.22,0.11
@@ -265,7 +265,7 @@ Not Exposed,7323,Print Finishing and Binding Workers,0.22,0.09
 Not Exposed,7513,Dairy Products Makers,0.22,0.17
 Not Exposed,7521,Wood Treaters,0.22,0.15
 Not Exposed,7523,Woodworking Machine Tool Setters and Operators,0.22,0.16
-Not Exposed,8183,Packing, Bottling and Labelling Machine Operators,0.22,0.01
+Not Exposed,8183,Packing Bottling and Labelling Machine Operators,0.22,0.01
 Not Exposed,2342,Early Childhood Educators,0.21,0.05
 Not Exposed,2651,Visual Artists,0.21,0.04
 Not Exposed,3143,Forestry Technicians,0.21,0.07
@@ -274,7 +274,7 @@ Not Exposed,7127,Air Conditioning and Refrigeration Mechanics,0.21,0.11
 Not Exposed,7213,Sheet Metal Workers,0.21,0.09
 Not Exposed,7311,Precision-instrument Makers and Repairers,0.21,0.08
 Not Exposed,8112,Mineral and Stone Processing Plant Operators,0.21,0.1
-Not Exposed,8154,Bleaching, Dyeing and Fabric Cleaning Machine Operators,0.21,0.15
+Not Exposed,8154,Bleaching Dyeing and Fabric Cleaning Machine Operators,0.21,0.15
 Not Exposed,9331,Hand and Pedal Vehicle Drivers,0.21,0.08
 Not Exposed,2269,Health Professionals Not Elsewhere Classified,0.2,0.08
 Not Exposed,3222,Midwifery Associate Professionals,0.2,0.07
@@ -284,7 +284,7 @@ Not Exposed,5414,Security Guards,0.2,0.09
 Not Exposed,5419,Protective Services Workers Not Elsewhere Classified,0.2,0.05
 Not Exposed,6129,Animal Producers Not Elsewhere Classified,0.2,0.14
 Not Exposed,7222,Toolmakers and Related Workers,0.2,0.1
-Not Exposed,8122,Metal Finishing, Plating and Coating Machine Operators,0.2,0.04
+Not Exposed,8122,Metal Finishing Plating and Coating Machine Operators,0.2,0.04
 Not Exposed,8182,Steam Engine and Boiler Operators,0.2,0.04
 Not Exposed,8311,Locomotive Engine Drivers,0.2,0.08
 Not Exposed,8344,Lifting Truck Operators,0.2,0.1
@@ -297,7 +297,7 @@ Not Exposed,5311,Child Care Workers,0.19,0.09
 Not Exposed,6122,Poultry Producers,0.19,0.1
 Not Exposed,6130,Mixed Crop and Animal Producers,0.19,0.11
 Not Exposed,7232,Aircraft Engine Mechanics and Repairers,0.19,0.07
-Not Exposed,7315,Glass Makers, Cutters, Grinders and Finishers,0.19,0.06
+Not Exposed,7315,Glass Makers Cutters Grinders and Finishers,0.19,0.06
 Not Exposed,7411,Building and Related Electricians,0.19,0.06
 Not Exposed,8113,Well Drillers and Borers and Related Workers,0.19,0.12
 Not Exposed,3214,Medical and Dental Prosthetic Technicians,0.18,0.05
@@ -305,19 +305,19 @@ Not Exposed,5120,Cooks,0.18,0.06
 Not Exposed,5142,Beauticians and Related Workers,0.18,0.19
 Not Exposed,5411,Fire Fighters,0.18,0.1
 Not Exposed,6111,Field Crop and Vegetable Growers,0.18,0.12
-Not Exposed,6113,Gardeners, Horticultural and Nursery Growers,0.18,0.11
+Not Exposed,6113,Gardeners Horticultural and Nursery Growers,0.18,0.11
 Not Exposed,6223,Deep-sea Fishery Workers,0.18,0.07
 Not Exposed,7126,Plumbers and Pipe Fitters,0.18,0.1
 Not Exposed,7223,Metal Working Machine Tool Setters and Operators,0.18,0.05
 Not Exposed,7231,Motor Vehicle Mechanics and Repairers,0.18,0.04
 Not Exposed,7313,Jewellery and Precious Metal Workers,0.18,0.05
 Not Exposed,7314,Potters and Related Workers,0.18,0.07
-Not Exposed,7316,Sign Writers, Decorative Painters, Engravers and Etchers,0.18,0.08
+Not Exposed,7316,Sign Writers Decorative Painters Engravers and Etchers,0.18,0.08
 Not Exposed,7534,Upholsterers and Related Workers,0.18,0.09
 Not Exposed,8141,Rubber Products Machine Operators,0.18,0.05
 Not Exposed,8143,Paper Products Machine Operators,0.18,0.02
 Not Exposed,8331,Bus and Tram Drivers,0.18,0.06
-Not Exposed,8343,Crane, hoist and related plant operators,0.18,0.03
+Not Exposed,8343,Crane hoist and related plant operators,0.18,0.03
 Not Exposed,9411,Fast Food Preparers,0.18,0.05
 Not Exposed,9510,Street and Related Service Workers,0.18,0.09
 Not Exposed,9612,Refuse Sorters,0.18,0.11
@@ -329,11 +329,11 @@ Not Exposed,6112,Tree and Shrub Crop Growers,0.17,0.11
 Not Exposed,6114,Mixed Crop Growers,0.17,0.12
 Not Exposed,6121,Livestock and Dairy Producers,0.17,0.1
 Not Exposed,6222,Inland and Coastal Waters Fishery Workers,0.17,0.1
-Not Exposed,7221,Blacksmiths, Hammersmiths and Forging Press Workers,0.17,0.05
-Not Exposed,7224,Metal Polishers, Wheel Grinders and Tool Sharpeners,0.17,0.05
+Not Exposed,7221,Blacksmiths Hammersmiths and Forging Press Workers,0.17,0.05
+Not Exposed,7224,Metal Polishers Wheel Grinders and Tool Sharpeners,0.17,0.05
 Not Exposed,7233,Agricultural and Industrial Machinery Mechanics and Repairers,0.17,0.04
 Not Exposed,7412,Electrical Mechanics and Fitters,0.17,0.05
-Not Exposed,7512,Bakers, Pastry-cooks and Confectionery Makers,0.17,0.08
+Not Exposed,7512,Bakers Pastry-cooks and Confectionery Makers,0.17,0.08
 Not Exposed,7532,Garment and Related Patternmakers and Cutters,0.17,0.04
 Not Exposed,7536,Shoemakers and Related Workers,0.17,0.06
 Not Exposed,8111,Miners and Quarriers,0.17,0.11
@@ -346,13 +346,13 @@ Not Exposed,7541,Underwater Divers,0.16,0.09
 Not Exposed,8152,Weaving and Knitting Machine Operators,0.16,0.03
 Not Exposed,8156,Shoemaking and Related Machine Operators,0.16,0.02
 Not Exposed,8157,Laundry Machine Operators,0.16,0.03
-Not Exposed,8159,Textile, Fur and Leather Products Machine Operators Not Elsewhere Classified,0.16,0.01
+Not Exposed,8159,Textile Fur and Leather Products Machine Operators Not Elsewhere Classified,0.16,0.01
 Not Exposed,2261,Dentists,0.15,0.06
 Not Exposed,5329,Personal Care Workers in Health Services Not Elsewhere Classified,0.15,0.03
 Not Exposed,7413,Electrical Line Installers and Repairers,0.15,0.08
-Not Exposed,7514,Fruit, Vegetable and Related Preservers,0.15,0.04
-Not Exposed,7531,Tailors, Dressmakers, Furriers and Hatters,0.15,0.05
-Not Exposed,8151,Fibre Preparing, Spinning and Winding Machine Operators,0.15,0.02
+Not Exposed,7514,Fruit Vegetable and Related Preservers,0.15,0.04
+Not Exposed,7531,Tailors Dressmakers Furriers and Hatters,0.15,0.05
+Not Exposed,8151,Fibre Preparing Spinning and Winding Machine Operators,0.15,0.02
 Not Exposed,8153,Sewing Machine Operators,0.15,0.03
 Not Exposed,8155,Fur and Leather Preparing Machine Operators,0.15,0.02
 Not Exposed,8160,Food and Related Products Machine Operators,0.15,0.03
@@ -365,7 +365,7 @@ Not Exposed,5413,Prison Guards,0.14,0.04
 Not Exposed,7111,House Builders,0.14,0.07
 Not Exposed,7125,Glaziers,0.14,0
 Not Exposed,7312,Musical Instrument Makers and Tuners,0.14,0.02
-Not Exposed,7317,Handicraft Workers in Wood, Basketry and Related Materials,0.14,0.01
+Not Exposed,7317,Handicraft Workers in Wood Basketry and Related Materials,0.14,0.01
 Not Exposed,7516,Tobacco Preparers and Tobacco Products Makers,0.14,0.06
 Not Exposed,7549,Craft and Related Workers not Elsewhere Classified,0.14,0.01
 Not Exposed,8172,Wood Processing Plant Operators,0.14,0.05
@@ -384,8 +384,8 @@ Not Exposed,7211,Metal Moulders and Coremakers,0.13,0.01
 Not Exposed,7212,Welders and Flame Cutters,0.13,0.05
 Not Exposed,7215,Riggers and Cable Splicers,0.13,0.03
 Not Exposed,7234,Bicycle and Related Repairers,0.13,0.02
-Not Exposed,7318,Handicraft Workers in Textile, Leather and Related Materials,0.13,0.03
-Not Exposed,7511,Butchers, Fishmongers and Related Food Preparers,0.13,0.03
+Not Exposed,7318,Handicraft Workers in Textile Leather and Related Materials,0.13,0.03
+Not Exposed,7511,Butchers Fishmongers and Related Food Preparers,0.13,0.03
 Not Exposed,7544,Fumigators and Other Pest and Weed Controllers,0.13,0.04
 Not Exposed,8342,Earthmoving and Related Plant Operators,0.13,0.02
 Not Exposed,9332,Drivers of Animal-drawn Vehicles and Machinery,0.13,0.08
@@ -393,25 +393,25 @@ Not Exposed,9412,Kitchen Helpers,0.13,0.02
 Not Exposed,3413,Religious Associate Professionals,0.12,0.07
 Not Exposed,6210,Forestry and Related Workers,0.12,0.05
 Not Exposed,6330,Subsistence Mixed Crop and Livestock Farmers,0.12,0.05
-Not Exposed,6340,Subsistence Fishers, Hunters, Trappers and Gatherers,0.12,0.05
+Not Exposed,6340,Subsistence Fishers Hunters Trappers and Gatherers,0.12,0.05
 Not Exposed,7132,Spray Painters and Varnishers,0.12,0
-Not Exposed,7533,Sewing, Embroidery and Related Workers,0.12,0.02
+Not Exposed,7533,Sewing Embroidery and Related Workers,0.12,0.02
 Not Exposed,7542,Shotfirers and Blasters,0.12,0.05
 Not Exposed,8341,Mobile Farm and Forestry Plant Operators,0.12,0.03
-Not Exposed,9112,Cleaners and Helpers in Offices, Hotels and Other Establishments,0.12,0.02
+Not Exposed,9112,Cleaners and Helpers in Offices Hotels and Other Establishments,0.12,0.02
 Not Exposed,9212,Livestock Farm Labourers,0.12,0.03
 Not Exposed,9214,Garden and Horticultural Labourers,0.12,0.02
 Not Exposed,9329,Manufacturing Labourers Not Elsewhere Classified,0.12,0.02
-Not Exposed,7113,Stonemasons, Stone Cutters, Splitters and Carvers,0.11,0.02
+Not Exposed,7113,Stonemasons Stone Cutters Splitters and Carvers,0.11,0.02
 Not Exposed,7123,Plasterers,0.11,0.01
 Not Exposed,7214,Structural Metal Preparers and Erectors,0.11,0.02
-Not Exposed,7535,Pelt Dressers, Tanners and Fellmongers,0.11,0.03
+Not Exposed,7535,Pelt Dressers Tanners and Fellmongers,0.11,0.03
 Not Exposed,9123,Window Cleaners,0.11,0.03
 Not Exposed,9213,Mixed Crop and Livestock Farm Labourers,0.11,0.03
 Not Exposed,9216,Fishery and Aquaculture Labourers,0.11,0.03
 Not Exposed,9311,Mining and Quarrying Labourers,0.11,0.02
 Not Exposed,9622,Odd Job Persons,0.11,0.03
-Not Exposed,7114,Concrete Placers, Concrete Finishers and Related Workers,0.1,0.03
+Not Exposed,7114,Concrete Placers Concrete Finishers and Related Workers,0.1,0.03
 Not Exposed,7122,Floor Layers and Tile Setters,0.1,0.02
 Not Exposed,9129,Other Cleaning Workers,0.1,0.01
 Not Exposed,6224,Hunters and Trappers,0.09,0.03
