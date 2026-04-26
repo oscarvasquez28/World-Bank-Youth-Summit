@@ -1,0 +1,29 @@
+{
+  "nav.discover": "Discover",
+  "nav.opportunities": "Opportunities",
+  "nav.for_companies": "For Companies",
+  "auth.sign_in": "Sign in",
+  "auth.sign_out": "Sign out",
+  "home.title": "Discover Opportunities from Your Skills",
+  "home.description": "Describe your skills in plain text and get suggested roles.",
+  "skill.label": "Describe your informal experience and demonstrated competences",
+  "skill.placeholder": "I help customers and use Excel to build reports...",
+  "skill.analyze": "Analyze",
+  "country.US": "🇺🇸 United States",
+  "country.MX": "🇲🇽 Mexico",
+  "analyzing": "Analyzing..."
+  ,"auth.signed_out": "Signed out",
+  "auth.signed_in": "Signed in"
+  ,"settings.language_changed": "Language saved"
+  ,"results.detected": "Detected Skills",
+  "results.no_skills": "No skills detected yet.",
+  "results.suggested": "Suggested Opportunities",
+  "results.no_opps": "No opportunities yet.",
+  "results.role_description": "Brief description placeholder for the role."
+  ,"opportunities.title": "Opportunities"
+  ,"opportunities.search_placeholder": "Search skills..."
+  ,"opportunities.no_skills_saved": "No skills saved yet."
+  ,"opportunities.for_skill": "Opportunities for {{skill}}"
+  ,"opportunities.no_for_skill": "No opportunities for this skill."
+  ,"opportunities.other": "Other Opportunities"
+}

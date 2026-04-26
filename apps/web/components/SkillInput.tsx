@@ -4,6 +4,7 @@ import React, { useState } from "react";
 import { Textarea } from "@/components/ui/textarea";
 import { Select } from "@/components/ui/select";
 import { Button } from "@/components/ui/button";
+import { useI18n } from '@/lib/i18n'
 
 type Props = {
   onAnalyze: (text: string, country: string) => void;
@@ -12,12 +13,13 @@ type Props = {
 export default function SkillInput({ onAnalyze }: Props) {
   const [text, setText] = useState("");
   const [country, setCountry] = useState("US");
+  const { t } = useI18n();
 
   return (
     <div className="w-full max-w-3xl mx-auto">
       <Textarea
-        label="Describe your skills"
-        placeholder="I help customers and use Excel to build reports..."
+        label={t('skill.label')}
+        placeholder={t('skill.placeholder')}
         value={text}
         onChange={(e) => setText(e.target.value)}
         className="min-h-[110px]"
@@ -26,8 +28,8 @@ export default function SkillInput({ onAnalyze }: Props) {
       <div className="mt-5 flex items-end gap-4">
         <div className="w-48">
           <Select value={country} onChange={(e) => setCountry(e.target.value)} label="Country">
-            <option value="US">🇺🇸 United States</option>
-            <option value="MX">🇲🇽 Mexico</option>
+            <option value="US">{t('country.US')}</option>
+            <option value="MX">{t('country.MX')}</option>
           </Select>
         </div>
         <div className="ml-auto w-48">
@@ -38,7 +40,7 @@ export default function SkillInput({ onAnalyze }: Props) {
               setText("");
             }}
           >
-            Analyze
+            {t('skill.analyze')}
           </Button>
         </div>
       </div>

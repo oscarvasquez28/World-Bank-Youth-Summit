@@ -5,23 +5,34 @@ import SkillInput from "@/components/SkillInput";
 import Results from "@/components/Results";
 import Spinner from "@/components/ui/spinner";
 import { motion } from 'framer-motion';
+import storage from '@/lib/storage';
 import api from "@/lib/api";
 import "@/lib/api.routes";
+import { useI18n } from '@/lib/i18n'
+import en from '@/locales/en.json';
+
+const titleCase = (v: any) => String(v || '')
+  .toLowerCase()
+  .replace(/\b\w/g, (c) => c.toUpperCase());
 
 export default function Home() {
+  const [mounted, setMounted] = useState(false);
+  useEffect(() => { setMounted(true); }, []);
   const [loading, setLoading] = useState(false);
   const [skills, setSkills] = useState<string[]>([]);
-  const [opportunities, setOpportunities] = useState<{ role: string; salary: string }[]>([]);
+  const [opportunities, setOpportunities] = useState<{ role: string }[]>([]);
   const [currentSkills, setCurrentSkills] = useState<string[]>([]);
-  const [currentOpportunities, setCurrentOpportunities] = useState<{ role: string; salary: string }[]>([]);
+  const [currentOpportunities, setCurrentOpportunities] = useState<{ role: string; salary?: string }[]>([]);
   const [error, setError] = useState<string | null>(null);
+
+  const { t } = useI18n();
 
   useEffect(() => {
     try {
-      const s = JSON.parse(localStorage.getItem('detectedSkills') || '[]');
-      const o = JSON.parse(localStorage.getItem('detectedOpportunities') || '[]');
+      const s = storage.getDetectedSkills();
+      const o = storage.getDetectedOpportunities();
       if (Array.isArray(s) && s.length) setSkills(s as string[]);
-      if (Array.isArray(o) && o.length) setOpportunities(o as { role: string; salary: string }[]);
+      if (Array.isArray(o) && o.length) setOpportunities(o as { role: string }[]);
     } catch (e) {
       console.warn('Failed to read detected skills from localStorage on mount', e);
     }
@@ -38,10 +49,11 @@ export default function Home() {
         .filter((t) => t.length > 2)
         .slice(0, 8);
 
-      const detected = Array.from(new Set(tokens)).slice(0, 8);
+      let detected = Array.from(new Set(tokens)).slice(0, 8);
+      detected = detected.map(titleCase);
 
       const opps = detected.slice(0, 4).map((s, i) => ({
-        role: `${s} Specialist`,
+        role: String(s),
         salary: country === "US" ? "$60k - $95k" : "$20k - $40k",
       }));
 
@@ -52,24 +64,21 @@ export default function Home() {
       setSkills((prev) => {
         const merged = Array.from(new Set([...prev, ...detected]));
         try {
-          localStorage.setItem('detectedSkills', JSON.stringify(merged));
+          storage.appendDetectedSkills(detected);
         } catch (e) {
-          console.warn('Failed to write detected skills to localStorage', e);
+          console.warn('Failed to append detected skills to storage', e);
         }
         return merged;
       });
 
       setOpportunities((prev) => {
-        const merged = [...prev];
-        opps.forEach((o) => {
-          if (!merged.find((m) => m.role === o.role && m.salary === o.salary)) merged.push(o);
-        });
+        const mergedRoles = Array.from(new Set([...prev.map((p) => p.role), ...opps.map((o) => o.role)])).map((r) => ({ role: r }));
         try {
-          localStorage.setItem('detectedOpportunities', JSON.stringify(merged));
+          storage.appendDetectedOpportunities(opps.map((o) => ({ role: o.role })));
         } catch (e) {
-          console.warn('Failed to write detected opportunities to localStorage', e);
+          console.warn('Failed to append detected opportunities to storage', e);
         }
-        return merged;
+        return mergedRoles;
       });
       setLoading(false);
     }, 900);
@@ -80,8 +89,9 @@ export default function Home() {
     setError(null);
     try {
       const data = await api.analyze({ text, country });
-      const detected = data.skills || [];
-      const opps = data.opportunities || [];
+      let detected = data.skills || [];
+      detected = detected.map(titleCase);
+      const opps: { role: string; salary?: string }[] = data.opportunities || [];
 
       // current results - only these should be shown on Discover
       setCurrentSkills(detected);
@@ -90,24 +100,21 @@ export default function Home() {
       setSkills((prev) => {
         const merged = Array.from(new Set([...prev, ...detected]));
         try {
-          localStorage.setItem('detectedSkills', JSON.stringify(merged));
+          storage.appendDetectedSkills(detected);
         } catch (e) {
-          console.warn('Failed to write detected skills to localStorage', e);
+          console.warn('Failed to append detected skills to storage', e);
         }
         return merged;
       });
 
       setOpportunities((prev) => {
-        const merged = [...prev];
-        opps.forEach((o) => {
-          if (!merged.find((m) => m.role === o.role && m.salary === o.salary)) merged.push(o);
-        });
+        const mergedRoles = Array.from(new Set([...prev.map((p) => p.role), ...opps.map((o) => o.role)])).map((r) => ({ role: r }));
         try {
-          localStorage.setItem('detectedOpportunities', JSON.stringify(merged));
+          storage.appendDetectedOpportunities(opps.map((o) => ({ role: o.role })));
         } catch (e) {
-          console.warn('Failed to write detected opportunities to localStorage', e);
+          console.warn('Failed to append detected opportunities to storage', e);
         }
-        return merged;
+        return mergedRoles;
       });
     } catch (err) {
       console.error("Analyze request failed:", err);
@@ -124,8 +131,8 @@ export default function Home() {
         <div className="mx-auto mb-10 flex justify-center">
           <div className="w-full rounded-3xl bg-white px-12 py-14 shadow-2xl dark:bg-zinc-900 dark:shadow-none">
             <div className="mb-6 text-center">
-              <h1 className="mx-auto max-w-4xl text-6xl font-extrabold leading-tight">Discover Opportunities from Your Skills</h1>
-              <p className="mx-auto mt-4 max-w-2xl text-zinc-600 dark:text-zinc-300">Describe your skills in plain text and get suggested roles and salary ranges.</p>
+              <h1 className="mx-auto max-w-4xl text-6xl font-extrabold leading-tight">{mounted ? t('home.title') : en['home.title']}</h1>
+              <p className="mx-auto mt-4 max-w-2xl text-zinc-600 dark:text-zinc-300">{mounted ? t('home.description') : en['home.description']}</p>
             </div>
 
             <div className="rounded-xl border border-neutral-100 bg-white p-6 shadow-sm dark:border-neutral-700 dark:bg-zinc-800">
@@ -140,12 +147,12 @@ export default function Home() {
                 <div className="mt-4 rounded-md bg-red-50 p-3 text-sm text-red-800">Error: {error}</div>
               )}
 
-              {loading && (
-                <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="mt-4 flex items-center justify-center gap-2 text-sm font-medium text-zinc-600">
-                  <Spinner size={18} />
-                  <span>Analyzing...</span>
-                </motion.div>
-              )}
+                      {loading && (
+                        <div className="mt-4 flex items-center justify-center gap-2 text-sm font-medium text-zinc-600">
+                          <Spinner size={18} />
+                          <span>{t('analyzing')}</span>
+                        </div>
+                      )}
             </div>
           </div>
         </div>

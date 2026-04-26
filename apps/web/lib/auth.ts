@@ -24,9 +24,8 @@ export function setUser(user: User) {
 
 export function clearUser() {
   try {
-    // also clear detected opportunities and detected skills on logout
-    localStorage.removeItem('detectedOpportunities');
-    localStorage.removeItem('detectedSkills');
+    // previously we cleared detected skills/opportunities on logout
+    // keep per-user storage intact so returning users keep their data
   } catch (e) {
     // ignore
   }
