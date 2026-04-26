@@ -1,7 +1,12 @@
 import * as React from "react";
 import { cn } from "@/lib/utils";
 
-const Badge = ({ children, className, ...props }: { children: React.ReactNode; className?: string, props: React.HTMLAttributes<HTMLSpanElement> }) => {
+type BadgeProps = React.HTMLAttributes<HTMLSpanElement> & {
+  children: React.ReactNode;
+  className?: string;
+};
+
+const Badge = ({ children, className, ...props }: BadgeProps) => {
   return (
     <span
       className={cn(
