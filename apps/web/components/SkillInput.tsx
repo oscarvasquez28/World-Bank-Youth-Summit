@@ -33,7 +33,10 @@ export default function SkillInput({ onAnalyze }: Props) {
         <div className="ml-auto w-48">
           <Button
             className="w-full bg-black text-white hover:bg-neutral-900 h-10 px-3 py-2 rounded-lg text-sm"
-            onClick={() => onAnalyze(text, country)}
+            onClick={() => {
+              onAnalyze(text, country);
+              setText("");
+            }}
           >
             Analyze
           </Button>

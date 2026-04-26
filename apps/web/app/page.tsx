@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import SkillInput from "@/components/SkillInput";
 import Results from "@/components/Results";
 import Spinner from "@/components/ui/spinner";
@@ -12,13 +12,23 @@ export default function Home() {
   const [loading, setLoading] = useState(false);
   const [skills, setSkills] = useState<string[]>([]);
   const [opportunities, setOpportunities] = useState<{ role: string; salary: string }[]>([]);
+  const [currentSkills, setCurrentSkills] = useState<string[]>([]);
+  const [currentOpportunities, setCurrentOpportunities] = useState<{ role: string; salary: string }[]>([]);
   const [error, setError] = useState<string | null>(null);
 
+  useEffect(() => {
+    try {
+      const s = JSON.parse(localStorage.getItem('detectedSkills') || '[]');
+      const o = JSON.parse(localStorage.getItem('detectedOpportunities') || '[]');
+      if (Array.isArray(s) && s.length) setSkills(s as string[]);
+      if (Array.isArray(o) && o.length) setOpportunities(o as { role: string; salary: string }[]);
+    } catch (e) {
+      console.warn('Failed to read detected skills from localStorage on mount', e);
+    }
+  }, []);
+
   function mockAnalyze(text: string, country: string) {
-    // kept for local fallback, but prefer server analyze
     setLoading(true);
-    setSkills([]);
-    setOpportunities([]);
 
     // simple mock: extract words longer than 3 letters and treat some as skills
     setTimeout(() => {
@@ -30,28 +40,75 @@ export default function Home() {
 
       const detected = Array.from(new Set(tokens)).slice(0, 8);
 
-      // mock opportunities
       const opps = detected.slice(0, 4).map((s, i) => ({
         role: `${s} Specialist`,
         salary: country === "US" ? "$60k - $95k" : "$20k - $40k",
       }));
 
-      setSkills(detected);
-      setOpportunities(opps);
+      // set current results for the Results panel (only show these on Discover)
+      setCurrentSkills(detected);
+      setCurrentOpportunities(opps);
+
+      setSkills((prev) => {
+        const merged = Array.from(new Set([...prev, ...detected]));
+        try {
+          localStorage.setItem('detectedSkills', JSON.stringify(merged));
+        } catch (e) {
+          console.warn('Failed to write detected skills to localStorage', e);
+        }
+        return merged;
+      });
+
+      setOpportunities((prev) => {
+        const merged = [...prev];
+        opps.forEach((o) => {
+          if (!merged.find((m) => m.role === o.role && m.salary === o.salary)) merged.push(o);
+        });
+        try {
+          localStorage.setItem('detectedOpportunities', JSON.stringify(merged));
+        } catch (e) {
+          console.warn('Failed to write detected opportunities to localStorage', e);
+        }
+        return merged;
+      });
       setLoading(false);
     }, 900);
   }
 
   async function analyzeRemote(text: string, country: string) {
     setLoading(true);
-    setSkills([]);
     setError(null);
-    setOpportunities([]);
-
     try {
       const data = await api.analyze({ text, country });
-      setSkills(data.skills || []);
-      setOpportunities(data.opportunities || []);
+      const detected = data.skills || [];
+      const opps = data.opportunities || [];
+
+      // current results - only these should be shown on Discover
+      setCurrentSkills(detected);
+      setCurrentOpportunities(opps);
+
+      setSkills((prev) => {
+        const merged = Array.from(new Set([...prev, ...detected]));
+        try {
+          localStorage.setItem('detectedSkills', JSON.stringify(merged));
+        } catch (e) {
+          console.warn('Failed to write detected skills to localStorage', e);
+        }
+        return merged;
+      });
+
+      setOpportunities((prev) => {
+        const merged = [...prev];
+        opps.forEach((o) => {
+          if (!merged.find((m) => m.role === o.role && m.salary === o.salary)) merged.push(o);
+        });
+        try {
+          localStorage.setItem('detectedOpportunities', JSON.stringify(merged));
+        } catch (e) {
+          console.warn('Failed to write detected opportunities to localStorage', e);
+        }
+        return merged;
+      });
     } catch (err) {
       console.error("Analyze request failed:", err);
       const msg = err instanceof Error ? err.message : String(err);
@@ -93,9 +150,9 @@ export default function Home() {
           </div>
         </div>
 
-        {!loading && (skills.length > 0 || opportunities.length > 0) && (
+        {!loading && (currentSkills.length > 0 || currentOpportunities.length > 0) && (
           <div className="mt-8">
-            <Results skills={skills} opportunities={opportunities} />
+            <Results skills={currentSkills} opportunities={currentOpportunities} />
           </div>
         )}
       </main>
