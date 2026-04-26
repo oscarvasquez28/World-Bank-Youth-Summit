@@ -24,6 +24,7 @@ export default function Home() {
   const [currentSkills, setCurrentSkills] = useState<string[]>([]);
   const [currentOpportunities, setCurrentOpportunities] = useState<{ role: string; salary?: string }[]>([]);
   const [lensData, setLensData] = useState<any | null>(null);
+  const [credentialData, setCredentialData] = useState<any | null>(null);
   const [error, setError] = useState<string | null>(null);
 
   const { t } = useI18n();
@@ -66,9 +67,11 @@ export default function Home() {
       try {
         const lens = await api.lens({ skills: detected, country });
         setLensData(lens);
+        setCredentialData(lens?.credential || lens?.passport || lens?.jsonld || (Array.isArray(lens?.credentials) ? lens.credentials[0] : null) || null);
       } catch (e) {
         console.warn('Failed to fetch lens data (mock)', e);
         setLensData(null);
+        setCredentialData(null);
       }
 
       setSkills((prev) => {
@@ -103,6 +106,9 @@ export default function Home() {
       detected = detected.map(titleCase);
       const opps: { role: string; salary?: string }[] = data.opportunities || [];
 
+      // Analyze may also return JSON-LD credential payloads in some deployments.
+      setCredentialData(data?.credential || data?.passport || data?.jsonld || (Array.isArray(data?.credentials) ? data.credentials[0] : null) || null);
+
       // current results - only these should be shown on Discover
       setCurrentSkills(detected);
       setCurrentOpportunities(opps);
@@ -111,6 +117,7 @@ export default function Home() {
       try {
         const lens = await api.lens({ skills: detected, country });
         setLensData(lens);
+        setCredentialData((prev: any) => prev || lens?.credential || lens?.passport || lens?.jsonld || (Array.isArray(lens?.credentials) ? lens.credentials[0] : null) || null);
       } catch (e) {
         console.warn('Failed to fetch lens data', e);
         setLensData(null);
@@ -178,7 +185,7 @@ export default function Home() {
 
         {!loading && (currentSkills.length > 0 || currentOpportunities.length > 0) && (
           <div className="mt-8">
-            <Results skills={currentSkills} opportunities={currentOpportunities} lens={lensData} />
+            <Results skills={currentSkills} opportunities={currentOpportunities} lens={lensData} credential={credentialData} />
           </div>
         )}
       </main>
