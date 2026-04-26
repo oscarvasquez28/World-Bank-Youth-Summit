@@ -6,6 +6,7 @@ import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import Spinner from "@/components/ui/spinner";
 import { useI18n } from "@/lib/i18n";
+import { getKnownUserById } from "@/lib/auth";
 
 type Candidate = {
   id: string;
@@ -63,14 +64,6 @@ function getCandidatesFromLocalStorage(requiredSkills: string[]): Candidate[] {
 
   const candidates: Candidate[] = [];
 
-  let currentUser: { id?: string; name?: string; email?: string } | null = null;
-  try {
-    const rawUser = localStorage.getItem("unmapped_user_v1");
-    currentUser = rawUser ? JSON.parse(rawUser) : null;
-  } catch (e) {
-    currentUser = null;
-  }
-
   for (let i = 0; i < localStorage.length; i += 1) {
     const key = localStorage.key(i);
     if (!key) continue;
@@ -91,14 +84,47 @@ function getCandidatesFromLocalStorage(requiredSkills: string[]): Candidate[] {
     const fallbackName = `User ${userId.slice(0, 8)}`;
     const fallbackEmail = `id:${userId}`;
 
-    const name = currentUser && currentUser.id === userId ? (currentUser.name || currentUser.email || fallbackName) : fallbackName;
-    const email = currentUser && currentUser.id === userId ? (currentUser.email || fallbackEmail) : fallbackEmail;
+    const known = getKnownUserById(userId);
+    const name = (known && (known.name || known.email)) || fallbackName;
+    const email = (known && known.email) || fallbackEmail;
 
     const candidate = buildCandidateFromSkills(userId, name, email, skills, requiredSkills);
     if (candidate) candidates.push(candidate);
   }
 
   return candidates.sort((a, b) => b.score - a.score || b.matchedSkills.length - a.matchedSkills.length);
+}
+
+function mergeCandidateSources(localCandidates: Candidate[], apiCandidates: Candidate[], requiredSkills: string[]): Candidate[] {
+  const byId = new Map<string, { local?: Candidate; api?: Candidate }>();
+
+  localCandidates.forEach((c) => {
+    const cur = byId.get(c.id) || {};
+    cur.local = c;
+    byId.set(c.id, cur);
+  });
+
+  apiCandidates.forEach((c) => {
+    const cur = byId.get(c.id) || {};
+    cur.api = c;
+    byId.set(c.id, cur);
+  });
+
+  const merged: Candidate[] = [];
+
+  byId.forEach((entry, id) => {
+    const local = entry.local;
+    const api = entry.api;
+
+    const combinedSkills = Array.from(new Set([...(local?.skills || []), ...(api?.skills || [])]));
+    const baseName = (local?.name && !local.name.startsWith("User ")) ? local.name : (api?.name || local?.name || `User ${id.slice(0, 8)}`);
+    const baseEmail = (local?.email && !local.email.startsWith("id:")) ? local.email : (api?.email || local?.email || `id:${id}`);
+
+    const rebuilt = buildCandidateFromSkills(id, baseName, baseEmail, combinedSkills, requiredSkills);
+    if (rebuilt) merged.push(rebuilt);
+  });
+
+  return merged.sort((a, b) => b.score - a.score || b.matchedSkills.length - a.matchedSkills.length);
 }
 
 export default function ForCompaniesPage() {
@@ -137,12 +163,8 @@ export default function ForCompaniesPage() {
       const apiRequiredSkills = Array.isArray(data.requiredSkills) ? data.requiredSkills : skills;
       const apiCandidates = Array.isArray(data.candidates) ? (data.candidates as Candidate[]) : [];
 
-      const merged = new Map<string, Candidate>();
-      localCandidates.forEach((c) => merged.set(c.id, c));
-      apiCandidates.forEach((c) => merged.set(c.id, c));
-
       setRequiredSkills(apiRequiredSkills);
-      setCandidates(Array.from(merged.values()).sort((a, b) => b.score - a.score || b.matchedSkills.length - a.matchedSkills.length));
+      setCandidates(mergeCandidateSources(localCandidates, apiCandidates, apiRequiredSkills));
     } catch (err) {
       if (localCandidates.length === 0) {
         const msg = err instanceof Error ? err.message : String(err);
