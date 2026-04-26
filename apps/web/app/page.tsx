@@ -122,13 +122,13 @@ export default function Home() {
     <div className="flex min-h-screen items-start bg-transparent p-8 pt-16 font-sans">
       <main className="w-full">
         <div className="mx-auto mb-10 flex justify-center">
-          <div className="w-full rounded-3xl bg-white px-12 py-14 shadow-2xl">
+          <div className="w-full rounded-3xl bg-white px-12 py-14 shadow-2xl dark:bg-zinc-900 dark:shadow-none">
             <div className="mb-6 text-center">
               <h1 className="mx-auto max-w-4xl text-6xl font-extrabold leading-tight">Discover Opportunities from Your Skills</h1>
-              <p className="mx-auto mt-4 max-w-2xl text-zinc-600">Describe your skills in plain text and get suggested roles and salary ranges.</p>
+              <p className="mx-auto mt-4 max-w-2xl text-zinc-600 dark:text-zinc-300">Describe your skills in plain text and get suggested roles and salary ranges.</p>
             </div>
 
-            <div className="rounded-xl border border-neutral-100 bg-white p-6 shadow-sm">
+            <div className="rounded-xl border border-neutral-100 bg-white p-6 shadow-sm dark:border-neutral-700 dark:bg-zinc-800">
               <SkillInput
                 onAnalyze={(text, country) => {
                   // prefer remote API; fallback to mock if API unreachable
