@@ -57,6 +57,7 @@
   ,"badge.uid": "Credential ID"
   ,"badge.skills": "Verified Skills"
   ,"badge.opportunities": "Matched Opportunities"
+  ,"badge.occupations": "Matching Occupations"
   ,"badge.share": "Share"
   ,"badge.copied": "Copied!"
   ,"badge.download": "Download JSON"
@@ -75,4 +76,29 @@
   ,"companies.no_matches": "No registered users match these skills yet."
   ,"companies.error_no_skills": "Add at least one required skill."
   ,"companies.error_match_failed": "Could not evaluate matches right now."
+  ,"nav.dashboard": "Dashboard",
+  "dashboard.title": "Policymaker Dashboard",
+  "dashboard.subtitle": "Aggregate labor-market and education signals from World Bank sources.",
+  "dashboard.country": "Country",
+  "dashboard.compare": "Compare",
+  "dashboard.compare_country": "Compare with",
+  "dashboard.macro": "Macro Indicators",
+  "dashboard.source": "Signals calibrated from World Bank WDI and Wittgenstein Centre projections.",
+  "dashboard.select_country": "Select country",
+  "dashboard.search_country": "Search country",
+  "dashboard.no_matches": "No matches",
+  "dashboard.resilience_gauge": "Resilience Gauge",
+  "dashboard.resilience": "Resilience",
+  "dashboard.resilience_help": "Composite of GDP growth, youth unemployment, and labor force participation.",
+  "dashboard.education_transition": "Education Transition",
+  "dashboard.education_transition_long": "Education Transition (Wittgenstein Projections)",
+  "dashboard.no_projection": "No projection data available for this country.",
+  "dashboard.calibrating": "Calibrating from official sources…",
+  "dashboard.ind.broadband_penetration": "Broadband (per 100)",
+  "dashboard.ind.internet_users_pct": "Internet Users",
+  "dashboard.ind.mobile_cellular_subs": "Mobile Subs (per 100)",
+  "dashboard.ind.gdp_per_capita_ppp": "GDP per Capita (PPP)",
+  "dashboard.ind.unemployment_youth": "Youth Unemployment",
+  "dashboard.ind.labor_force_participation": "Labor Force Participation",
+  "dashboard.ind.school_enrollment_tertiary": "Tertiary Enrollment"
 }

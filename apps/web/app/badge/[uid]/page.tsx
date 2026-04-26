@@ -6,16 +6,31 @@ import { motion } from "framer-motion";
 import { Badge } from "@/components/ui/badge";
 import { useI18n } from "@/lib/i18n";
 
+type BadgeOccupation = {
+  name: string;
+  matching_percentage?: number;
+  description?: string;
+  skills?: string[];
+};
+
 type BadgePayload = {
   uid: string;
   recipientName: string;
   recipientId: string;
   skills: string[];
   selectedSkills?: string[];
-  opportunities: { role: string }[];
+  // Newer payloads use `occupations`; older ones use `opportunities`.
+  occupations?: BadgeOccupation[];
+  opportunities?: { role: string }[];
   issuer: { name: string; description: string };
   generatedAt: string;
 };
+
+function titleCase(v: string) {
+  return String(v || "")
+    .toLowerCase()
+    .replace(/\b\w/g, (c) => c.toUpperCase());
+}
 
 function initials(name: string) {
   const parts = String(name || "")
@@ -228,26 +243,50 @@ export default function BadgePage() {
               </div>
             </div>
 
-            {/* Opportunities */}
-            {data.opportunities && data.opportunities.length > 0 && (
+            {/* Matching Occupations */}
+            {((data.occupations && data.occupations.length > 0) ||
+              (data.opportunities && data.opportunities.length > 0)) && (
               <div className="border-t border-neutral-100 px-8 py-6 dark:border-neutral-800">
                 <h2 className="text-sm font-semibold uppercase tracking-wider text-zinc-500 dark:text-zinc-400">
-                  {t("badge.opportunities")}
+                  {t("badge.occupations")}
                 </h2>
                 <div className="mt-3 grid gap-2 sm:grid-cols-2">
-                  {data.opportunities.map((o, i) => (
-                    <div
-                      key={`${o.role}-${i}`}
-                      className="flex items-center gap-3 rounded-xl border border-neutral-100 bg-neutral-50 px-3 py-2 text-sm dark:border-neutral-700 dark:bg-zinc-800"
-                    >
-                      <span className="flex h-8 w-8 items-center justify-center rounded-full bg-emerald-100 text-xs font-semibold text-emerald-700 dark:bg-emerald-900/50 dark:text-emerald-200">
-                        {String(i + 1).padStart(2, "0")}
-                      </span>
-                      <span className="font-medium text-zinc-800 dark:text-zinc-100">
-                        {o.role}
-                      </span>
-                    </div>
-                  ))}
+                  {data.occupations && data.occupations.length > 0
+                    ? data.occupations.map((o, i) => (
+                        <div
+                          key={`${o.name}-${i}`}
+                          className="flex items-start gap-3 rounded-xl border border-neutral-100 bg-neutral-50 px-3 py-2 text-sm dark:border-neutral-700 dark:bg-zinc-800"
+                        >
+                          <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-emerald-100 text-[11px] font-semibold text-emerald-700 dark:bg-emerald-900/50 dark:text-emerald-200">
+                            {typeof o.matching_percentage === "number"
+                              ? `${Math.round(o.matching_percentage)}%`
+                              : String(i + 1).padStart(2, "0")}
+                          </span>
+                          <div className="min-w-0 flex-1">
+                            <div className="truncate font-medium text-zinc-800 dark:text-zinc-100">
+                              {titleCase(o.name)}
+                            </div>
+                            {o.skills && o.skills.length > 0 && (
+                              <div className="mt-0.5 truncate text-xs text-zinc-500 dark:text-zinc-400">
+                                {o.skills.map((s) => titleCase(s)).join(", ")}
+                              </div>
+                            )}
+                          </div>
+                        </div>
+                      ))
+                    : data.opportunities!.map((o, i) => (
+                        <div
+                          key={`${o.role}-${i}`}
+                          className="flex items-center gap-3 rounded-xl border border-neutral-100 bg-neutral-50 px-3 py-2 text-sm dark:border-neutral-700 dark:bg-zinc-800"
+                        >
+                          <span className="flex h-8 w-8 items-center justify-center rounded-full bg-emerald-100 text-xs font-semibold text-emerald-700 dark:bg-emerald-900/50 dark:text-emerald-200">
+                            {String(i + 1).padStart(2, "0")}
+                          </span>
+                          <span className="font-medium text-zinc-800 dark:text-zinc-100">
+                            {titleCase(o.role)}
+                          </span>
+                        </div>
+                      ))}
                 </div>
               </div>
             )}
