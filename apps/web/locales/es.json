@@ -5,7 +5,7 @@
   "auth.sign_in": "Iniciar sesión",
   "auth.sign_out": "Cerrar sesión",
   "home.title": "Descubre oportunidades a partir de tus habilidades",
-  "home.description": "Describe tus habilidades en texto libre y recibe sugerencias de roles y rangos salariales.",
+  "home.description": "Describe tus habilidades en texto libre y recibe sugerencias de roles.",
   "skill.label": "Describe tu experiencia informal y competencias demostradas",
   "skill.placeholder": "Ayudo a clientes y uso Excel para generar reportes...",
   "skill.analyze": "Analizar",
@@ -14,6 +14,7 @@
   "analyzing": "Analizando..."
   ,"auth.signed_out": "Sesión cerrada",
   "auth.signed_in": "Sesión iniciada"
+  ,"settings.language_changed": "Idioma guardado"
   ,"results.detected": "Habilidades detectadas",
   "results.no_skills": "Aún no se detectan habilidades.",
   "results.suggested": "Oportunidades sugeridas",
