@@ -1,57 +1,185 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import SkillInput from "@/components/SkillInput";
-import Results from "@/components/Results";
+import Results from "../components/Results";
 import Spinner from "@/components/ui/spinner";
 import { motion } from 'framer-motion';
+import storage from '@/lib/storage';
+import { indexOccupationsBySkill } from '@/lib/occupations';
 import api from "@/lib/api";
 import "@/lib/api.routes";
+import { useI18n } from '@/lib/i18n'
+import en from '@/locales/en.json';
+
+const titleCase = (v: any) => String(v || '')
+  .toLowerCase()
+  .replace(/\b\w/g, (c) => c.toUpperCase());
 
 export default function Home() {
+  const [mounted, setMounted] = useState(false);
+  useEffect(() => { setMounted(true); }, []);
   const [loading, setLoading] = useState(false);
   const [skills, setSkills] = useState<string[]>([]);
-  const [opportunities, setOpportunities] = useState<{ role: string; salary: string }[]>([]);
+  const [opportunities, setOpportunities] = useState<{ role: string }[]>([]);
+  const [currentSkills, setCurrentSkills] = useState<string[]>([]);
+  const [currentOpportunities, setCurrentOpportunities] = useState<{ role: string; salary?: string }[]>([]);
+  const [lensData, setLensData] = useState<any | null>(null);
+  const [occupationsData, setOccupationsData] = useState<Record<string, any> | null>(null);
+  const [credentialData, setCredentialData] = useState<any | null>(null);
+  const [education, setEducation] = useState<number | null>(null);
   const [error, setError] = useState<string | null>(null);
 
-  function mockAnalyze(text: string, country: string) {
-    // kept for local fallback, but prefer server analyze
+  const { t } = useI18n();
+
+  useEffect(() => {
+    try {
+      const s = storage.getDetectedSkills();
+      const o = storage.getDetectedOpportunities();
+      if (Array.isArray(s) && s.length) setSkills(s as string[]);
+      if (Array.isArray(o) && o.length) setOpportunities(o as { role: string }[]);
+    } catch (e) {
+      console.warn('Failed to read detected skills from localStorage on mount', e);
+    }
+  }, []);
+
+  function mockAnalyze(text: string, country: string, educationParam: number | null = null) {
     setLoading(true);
-    setSkills([]);
-    setOpportunities([]);
 
     // simple mock: extract words longer than 3 letters and treat some as skills
-    setTimeout(() => {
+    setTimeout(async () => {
       const tokens = text
         .split(/[^A-Za-z0-9\+\#\-]+/)
         .map((t) => t.trim())
         .filter((t) => t.length > 2)
         .slice(0, 8);
 
-      const detected = Array.from(new Set(tokens)).slice(0, 8);
-
-      // mock opportunities
-      const opps = detected.slice(0, 4).map((s, i) => ({
-        role: `${s} Specialist`,
+      const detectedRaw = Array.from(new Set(tokens)).slice(0, 8);
+      const opps = detectedRaw.slice(0, 4).map((s) => ({
+        role: String(s),
         salary: country === "US" ? "$60k - $95k" : "$20k - $40k",
       }));
 
-      setSkills(detected);
-      setOpportunities(opps);
+      // set current results for the Results panel (only show these on Discover)
+      setCurrentSkills(detectedRaw);
+      setCurrentOpportunities(opps);
+
+      // call lens endpoint with detected skills (best-effort)
+      try {
+        const lens = await api.lens({ skills: detectedRaw, country });
+        setLensData(lens);
+        setCredentialData(lens?.credential || lens?.passport || lens?.jsonld || (Array.isArray(lens?.credentials) ? lens.credentials[0] : null) || null);
+      } catch (e) {
+        console.warn('Failed to fetch lens data (mock)', e);
+        setLensData(null);
+        setCredentialData(null);
+      }
+
+      try {
+        const occupations = await api.occupations({
+          skills: detectedRaw,
+          country,
+          top_n: 10,
+          education_level: educationParam,
+        });
+        setOccupationsData(occupations || null);
+        try {
+          const map = indexOccupationsBySkill(occupations as any, detectedRaw);
+          if (Object.keys(map).length > 0) storage.mergeOccupationsBySkill(map);
+        } catch (e) {
+          console.warn('Failed to persist occupations to storage', e);
+        }
+      } catch (e) {
+        console.warn('Failed to fetch occupations data (mock)', e);
+        setOccupationsData(null);
+      }
+
+      setSkills((prev) => {
+        const merged = Array.from(new Set([...prev, ...detectedRaw]));
+        try {
+          storage.appendDetectedSkills(detectedRaw);
+        } catch (e) {
+          console.warn('Failed to append detected skills to storage', e);
+        }
+        return merged;
+      });
+
+      setOpportunities((prev) => {
+        const mergedRoles = Array.from(new Set([...prev.map((p) => p.role), ...opps.map((o) => o.role)])).map((r) => ({ role: r }));
+        try {
+          storage.appendDetectedOpportunities(opps.map((o) => ({ role: o.role })));
+        } catch (e) {
+          console.warn('Failed to append detected opportunities to storage', e);
+        }
+        return mergedRoles;
+      });
       setLoading(false);
     }, 900);
   }
 
-  async function analyzeRemote(text: string, country: string) {
+  async function analyzeRemote(text: string, country: string, educationParam: number | null = null) {
     setLoading(true);
-    setSkills([]);
     setError(null);
-    setOpportunities([]);
-
     try {
       const data = await api.analyze({ text, country });
-      setSkills(data.skills || []);
-      setOpportunities(data.opportunities || []);
+      const detectedRaw: string[] = Array.isArray(data.skills) ? data.skills : [];
+      const opps: { role: string; salary?: string }[] = data.opportunities || [];
+
+      // Analyze may also return JSON-LD credential payloads in some deployments.
+      setCredentialData(data?.credential || data?.passport || data?.jsonld || (Array.isArray(data?.credentials) ? data.credentials[0] : null) || null);
+
+      // current results - only these should be shown on Discover
+      setCurrentSkills(detectedRaw);
+      setCurrentOpportunities(opps);
+      
+      // call lens endpoint with detected skills (real API path)
+      try {
+        const lens = await api.lens({ skills: detectedRaw, country });
+        setLensData(lens);
+        setCredentialData((prev: any) => prev || lens?.credential || lens?.passport || lens?.jsonld || (Array.isArray(lens?.credentials) ? lens.credentials[0] : null) || null);
+      } catch (e) {
+        console.warn('Failed to fetch lens data', e);
+        setLensData(null);
+      }
+
+      try {
+        const occupations = await api.occupations({
+          skills: detectedRaw,
+          country,
+          top_n: 10,
+          education_level: educationParam,
+        });
+        setOccupationsData(occupations || null);
+        try {
+          const map = indexOccupationsBySkill(occupations as any, detectedRaw);
+          if (Object.keys(map).length > 0) storage.mergeOccupationsBySkill(map);
+        } catch (e) {
+          console.warn('Failed to persist occupations to storage', e);
+        }
+      } catch (e) {
+        console.warn('Failed to fetch occupations data', e);
+        setOccupationsData(null);
+      }
+
+      setSkills((prev) => {
+        const merged = Array.from(new Set([...prev, ...detectedRaw]));
+        try {
+          storage.appendDetectedSkills(detectedRaw);
+        } catch (e) {
+          console.warn('Failed to append detected skills to storage', e);
+        }
+        return merged;
+      });
+
+      setOpportunities((prev) => {
+        const mergedRoles = Array.from(new Set([...prev.map((p) => p.role), ...opps.map((o) => o.role)])).map((r) => ({ role: r }));
+        try {
+          storage.appendDetectedOpportunities(opps.map((o) => ({ role: o.role })));
+        } catch (e) {
+          console.warn('Failed to append detected opportunities to storage', e);
+        }
+        return mergedRoles;
+      });
     } catch (err) {
       console.error("Analyze request failed:", err);
       const msg = err instanceof Error ? err.message : String(err);
@@ -65,17 +193,19 @@ export default function Home() {
     <div className="flex min-h-screen items-start bg-transparent p-8 pt-16 font-sans">
       <main className="w-full">
         <div className="mx-auto mb-10 flex justify-center">
-          <div className="w-full rounded-3xl bg-white px-12 py-14 shadow-2xl">
+          <div className="w-full rounded-3xl bg-white px-12 py-14 shadow-2xl dark:bg-zinc-900 dark:shadow-none">
             <div className="mb-6 text-center">
-              <h1 className="mx-auto max-w-4xl text-6xl font-extrabold leading-tight">Discover Opportunities from Your Skills</h1>
-              <p className="mx-auto mt-4 max-w-2xl text-zinc-600">Describe your skills in plain text and get suggested roles and salary ranges.</p>
+              <h1 className="mx-auto max-w-4xl text-6xl font-extrabold leading-tight">{mounted ? t('home.title') : en['home.title']}</h1>
+              <p className="mx-auto mt-4 max-w-2xl text-zinc-600 dark:text-zinc-300">{mounted ? t('home.description') : en['home.description']}</p>
             </div>
 
-            <div className="rounded-xl border border-neutral-100 bg-white p-6 shadow-sm">
+            <div className="rounded-xl border border-neutral-100 bg-white p-6 shadow-sm dark:border-neutral-700 dark:bg-zinc-800">
               <SkillInput
-                onAnalyze={(text, country) => {
+                onAnalyze={(text, country, edu) => {
+                  // remember selected education for results display
+                  setEducation(edu);
                   // prefer remote API; fallback to mock if API unreachable
-                  analyzeRemote(text, country).catch(() => mockAnalyze(text, country));
+                  analyzeRemote(text, country, edu).catch(() => mockAnalyze(text, country, edu));
                 }}
               />
 
@@ -83,19 +213,26 @@ export default function Home() {
                 <div className="mt-4 rounded-md bg-red-50 p-3 text-sm text-red-800">Error: {error}</div>
               )}
 
-              {loading && (
-                <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="mt-4 flex items-center justify-center gap-2 text-sm font-medium text-zinc-600">
-                  <Spinner size={18} />
-                  <span>Analyzing...</span>
-                </motion.div>
-              )}
+                      {loading && (
+                        <div className="mt-4 flex items-center justify-center gap-2 text-sm font-medium text-zinc-600">
+                          <Spinner size={18} />
+                          <span>{t('analyzing')}</span>
+                        </div>
+                      )}
             </div>
           </div>
         </div>
 
-        {!loading && (skills.length > 0 || opportunities.length > 0) && (
+        {!loading && (currentSkills.length > 0 || currentOpportunities.length > 0) && (
           <div className="mt-8">
-            <Results skills={skills} opportunities={opportunities} />
+            <Results
+              skills={currentSkills}
+              opportunities={currentOpportunities}
+              lens={lensData}
+              occupations={occupationsData}
+              credential={credentialData}
+              education={education}
+            />
           </div>
         )}
       </main>

@@ -1,0 +1,105 @@
+{
+  "nav.discover": "Descubrir",
+  "nav.opportunities": "Oportunidades",
+  "nav.for_companies": "Para empresas",
+  "auth.sign_in": "Iniciar sesión",
+  "auth.sign_out": "Cerrar sesión",
+  "home.title": "Descubre oportunidades a partir de tus habilidades",
+  "home.description": "Describe tus habilidades en texto libre y recibe sugerencias de roles.",
+  "skill.label": "Describe tu experiencia informal y competencias demostradas",
+  "skill.placeholder": "Ayudo a clientes y uso Excel para generar reportes...",
+  "skill.analyze": "Analizar",
+  "country.US": "🇺🇸 Estados Unidos",
+  "country.MX": "🇲🇽 México",
+  "analyzing": "Analizando..."
+  ,"auth.signed_out": "Sesión cerrada",
+  "auth.signed_in": "Sesión iniciada"
+  ,"settings.language_changed": "Idioma guardado"
+  ,"results.detected": "Habilidades detectadas",
+  "results.no_skills": "Aún no se detectan habilidades.",
+  "results.suggested": "Oportunidades sugeridas",
+  "results.no_resilience": "Aún no se detectan habilidades de resiliencia.",
+  "results.no_durable": "Aún no se detectan habilidades duraderas.",
+  "results.no_risks": "Aún no se detectan riesgos.",
+  "results.skills_at_risk": "Habilidades en riesgo",
+  "results.durable_skills": "Habilidades duraderas",
+  "results.resilience_pathways": "Caminos de resiliencia",
+  "results.no_opps": "Aún no hay oportunidades.",
+  "results.role_description": "Descripción breve de ejemplo para el rol."
+  ,"results.occupations_title": "Ocupaciones relacionadas"
+  ,"results.no_occupations": "Aún no se encontraron ocupaciones."
+  ,"opportunities.title": "Oportunidades"
+  ,"opportunities.search_placeholder": "Buscar habilidades..."
+  ,"opportunities.no_skills_saved": "Aún no hay habilidades guardadas."
+  ,"opportunities.for_skill": "Oportunidades para {{skill}}"
+  ,"opportunities.no_for_skill": "No hay oportunidades para esta habilidad."
+  ,"opportunities.other": "Otras oportunidades"
+  ,"opportunities.generate_badge": "Generar insignia"
+  ,"badge.title": "Pasaporte de habilidades"
+  ,"education.label": "Nivel educativo (ISCED)"
+  ,"education.placeholder": "Selecciona nivel educativo"
+  ,"education.options.ISCED_0": "ISCED 0 — Educación infantil"
+  ,"education.options.ISCED_1": "ISCED 1 — Educación primaria"
+  ,"education.options.ISCED_2": "ISCED 2 — Educación secundaria inferior"
+  ,"education.options.ISCED_3": "ISCED 3 — Educación secundaria superior"
+  ,"education.options.ISCED_4": "ISCED 4 — Educación post-secundaria no terciaria"
+  ,"education.options.ISCED_5": "ISCED 5 — Educación terciaria de ciclo corto"
+  ,"education.options.ISCED_6": "ISCED 6 — Licenciatura o equivalente"
+  ,"education.options.ISCED_7": "ISCED 7 — Máster o equivalente"
+  ,"education.options.ISCED_8": "ISCED 8 — Doctorado o equivalente"
+
+  ,"results.isced_required": "Educación requerida: {{level}}"
+  ,"results.isced_user": "Tu educación: {{level}}"
+  ,"results.isced_meets": "Cumple requisito"
+  ,"results.isced_not_meet": "No cumple requisito"
+  ,"results.missing_essential_skills": "Habilidades esenciales faltantes"
+  ,"badge.issued_to": "Emitido a"
+  ,"badge.issued_on": "Emitido el"
+  ,"badge.uid": "ID de credencial"
+  ,"badge.skills": "Habilidades verificadas"
+  ,"badge.opportunities": "Oportunidades coincidentes"
+  ,"badge.occupations": "Ocupaciones coincidentes"
+  ,"badge.share": "Compartir"
+  ,"badge.copied": "¡Copiado!"
+  ,"badge.download": "Descargar JSON"
+  ,"badge.download_blob": "Descargar Blob"
+  ,"badge.not_found_title": "Insignia no encontrada"
+  ,"badge.not_found_desc": "Esta insignia no se ha generado en este dispositivo. Abre el enlace desde el dispositivo donde se creó."
+  ,"companies.title": "Para empresas"
+  ,"companies.subtitle": "Pega las habilidades requeridas para una vacante y encuentra usuarios registrados que coincidan."
+  ,"companies.form_title": "Requisitos de la vacante"
+  ,"companies.required_skills": "Habilidades requeridas"
+  ,"companies.skills_placeholder": "Excel, Atención al cliente, Análisis de datos"
+  ,"companies.find_candidates": "Buscar candidatos"
+  ,"companies.results_title": "Candidatos compatibles"
+  ,"companies.matched_skills": "Habilidades que cumple"
+  ,"companies.missing_skills": "Habilidades faltantes"
+  ,"companies.no_matches": "Aún no hay usuarios registrados que cumplan estas habilidades."
+  ,"companies.error_no_skills": "Agrega al menos una habilidad requerida."
+  ,"companies.error_match_failed": "No se pudo evaluar coincidencias en este momento.",
+  "nav.dashboard": "Tablero",
+  "dashboard.title": "Tablero para responsables de política",
+  "dashboard.subtitle": "Señales agregadas del mercado laboral y educación a partir de fuentes del Banco Mundial.",
+  "dashboard.country": "País",
+  "dashboard.compare": "Comparar",
+  "dashboard.compare_country": "Comparar con",
+  "dashboard.macro": "Indicadores macro",
+  "dashboard.source": "Señales calibradas con WDI del Banco Mundial y proyecciones del Centro Wittgenstein.",
+  "dashboard.select_country": "Selecciona un país",
+  "dashboard.search_country": "Buscar país",
+  "dashboard.no_matches": "Sin coincidencias",
+  "dashboard.resilience_gauge": "Indicador de resiliencia",
+  "dashboard.resilience": "Resiliencia",
+  "dashboard.resilience_help": "Combina crecimiento del PIB, desempleo juvenil y participación laboral.",
+  "dashboard.education_transition": "Transición educativa",
+  "dashboard.education_transition_long": "Transición educativa (Proyecciones Wittgenstein)",
+  "dashboard.no_projection": "No hay datos de proyección para este país.",
+  "dashboard.calibrating": "Calibrando desde fuentes oficiales…",
+  "dashboard.ind.broadband_penetration": "Banda ancha (por 100)",
+  "dashboard.ind.internet_users_pct": "Usuarios de internet",
+  "dashboard.ind.mobile_cellular_subs": "Suscripciones móviles (por 100)",
+  "dashboard.ind.gdp_per_capita_ppp": "PIB per cápita (PPA)",
+  "dashboard.ind.unemployment_youth": "Desempleo juvenil",
+  "dashboard.ind.labor_force_participation": "Participación laboral",
+  "dashboard.ind.school_enrollment_tertiary": "Matrícula terciaria"
+}
