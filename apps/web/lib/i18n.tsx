@@ -22,14 +22,35 @@ type I18nContext = {
 const I18nCtx = createContext<I18nContext | undefined>(undefined);
 
 export function I18nProvider({ children, initialLocale }: { children: React.ReactNode; initialLocale?: Locale }) {
-  const initial = initialLocale || (typeof window !== 'undefined' && (localStorage.getItem(LOCALE_KEY) as Locale)) || 'en';
+  // Avoid reading localStorage during render to prevent SSR/client mismatch.
+  // Start with server-provided `initialLocale` if available, otherwise default to 'en'.
+  const initial = (initialLocale as Locale) || 'en';
   const [locale, setLocaleState] = useState<Locale>(initial as Locale);
+  // debug: log initial values on client render
+  try {
+    // eslint-disable-next-line no-console
+    console.log('I18nProvider:init', { initialLocale, initial });
+  } catch (e) {}
+
+  // On mount, sync from localStorage if user previously selected a locale.
+  useEffect(() => {
+    try {
+      const stored = localStorage.getItem(LOCALE_KEY) as Locale | null;
+      // debug: log stored value
+      // eslint-disable-next-line no-console
+      console.log('I18nProvider:mounted stored', { stored, locale });
+      if (stored && stored !== locale) {
+        setLocaleState(stored);
+      }
+    } catch (e) {
+      // ignore
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   useEffect(() => {
     try {
-      // ensure localStorage reflects current locale (do not change locale here to avoid hydration mismatch)
       localStorage.setItem(LOCALE_KEY, locale);
-      // also write a cookie so server renders can read the preference
       document.cookie = `${LOCALE_KEY}=${locale}; Path=/; Max-Age=${60 * 60 * 24 * 365}`;
     } catch (e) {
       // ignore

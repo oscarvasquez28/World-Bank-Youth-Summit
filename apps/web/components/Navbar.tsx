@@ -88,7 +88,7 @@ export default function Navbar() {
   );
 }
 function LanguageMenu() {
-  const { locale, setLocale } = useI18n();
+  const { locale, setLocale, t } = useI18n();
 
   return (
     <select
@@ -97,8 +97,9 @@ function LanguageMenu() {
       onChange={(e) => {
         const v = e.target.value as any;
         setLocale(v);
-        // reload so server can render the chosen locale (cookie is written in provider)
-        try { window.location.reload(); } catch (e) { /* ignore */ }
+        // apply change on client only to avoid hydration mismatch;
+        // the provider writes the cookie so the server will render the new locale on next full load
+        try { toast(t('settings.language_changed')); } catch (e) { /* ignore */ }
       }}
       className="h-9 rounded-md bg-zinc-100 text-sm text-zinc-700 dark:bg-zinc-800 dark:text-zinc-200 px-2"
     >
@@ -118,7 +119,7 @@ function ProfileMenu({ user, onSignOut } : { user: any | null; onSignOut: () => 
         aria-expanded={open}
         className="inline-flex items-center gap-2 rounded-full focus:outline-none"
       >
-        <Avatar initials={user ? (user.name ? user.name.split(' ').map(p => p[0]).slice(0, 2).join('') : (user.email?.[0] ?? undefined)) : undefined} />
+        <Avatar initials={user ? (user.name ? user.name.split(' ').map((p: string) => p[0]).slice(0, 2).join('') : (user.email?.[0] ?? undefined)) : undefined} />
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden>
           <path d="M6 9l6 6 6-6" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" className="text-zinc-600" />
         </svg>

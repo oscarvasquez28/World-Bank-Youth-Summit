@@ -5,7 +5,7 @@
   "auth.sign_in": "Sign in",
   "auth.sign_out": "Sign out",
   "home.title": "Discover Opportunities from Your Skills",
-  "home.description": "Describe your skills in plain text and get suggested roles and salary ranges.",
+  "home.description": "Describe your skills in plain text and get suggested roles.",
   "skill.label": "Describe your informal experience and demonstrated competences",
   "skill.placeholder": "I help customers and use Excel to build reports...",
   "skill.analyze": "Analyze",
@@ -14,6 +14,7 @@
   "analyzing": "Analyzing..."
   ,"auth.signed_out": "Signed out",
   "auth.signed_in": "Signed in"
+  ,"settings.language_changed": "Language saved"
   ,"results.detected": "Detected Skills",
   "results.no_skills": "No skills detected yet.",
   "results.suggested": "Suggested Opportunities",
