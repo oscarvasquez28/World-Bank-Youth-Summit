@@ -108,6 +108,8 @@ class OccupationDetail(BaseModel):
     matching_skills: list[str] = Field(..., description="Skills from user input that match this occupation")
     description: str = Field(..., description="Job description from ESCO")
     matching_percentage: float = Field(..., description="Percentage of occupation skills matched")
+    opportunity_type: str = Field(..., description="Categorization: Formal Employment, Self-Employment, Gig")
+    isced_level: int = Field(..., description="Expected ISCED education level (0-8)")
 
 
 
@@ -215,7 +217,9 @@ def _process_occupations(skills: list[str], locale: str, top_n: int) -> dict[str
         results[occ_name] = {
             "matching_skills": item["matching_skills"],
             "description": item["description"],
-            "matching_percentage": item["matching_percentage"]
+            "matching_percentage": item["matching_percentage"],
+            "opportunity_type": item["opportunity_type"],
+            "isced_level": item["isced_level"]
         }
 
     return results
