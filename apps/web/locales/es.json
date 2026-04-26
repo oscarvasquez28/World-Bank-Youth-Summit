@@ -41,6 +41,7 @@
   ,"badge.uid": "ID de credencial"
   ,"badge.skills": "Habilidades verificadas"
   ,"badge.opportunities": "Oportunidades coincidentes"
+  ,"badge.occupations": "Ocupaciones coincidentes"
   ,"badge.share": "Compartir"
   ,"badge.copied": "¡Copiado!"
   ,"badge.download": "Descargar JSON"
@@ -58,5 +59,30 @@
   ,"companies.missing_skills": "Habilidades faltantes"
   ,"companies.no_matches": "Aún no hay usuarios registrados que cumplan estas habilidades."
   ,"companies.error_no_skills": "Agrega al menos una habilidad requerida."
-  ,"companies.error_match_failed": "No se pudo evaluar coincidencias en este momento."
+  ,"companies.error_match_failed": "No se pudo evaluar coincidencias en este momento.",
+  "nav.dashboard": "Tablero",
+  "dashboard.title": "Tablero para responsables de política",
+  "dashboard.subtitle": "Señales agregadas del mercado laboral y educación a partir de fuentes del Banco Mundial.",
+  "dashboard.country": "País",
+  "dashboard.compare": "Comparar",
+  "dashboard.compare_country": "Comparar con",
+  "dashboard.macro": "Indicadores macro",
+  "dashboard.source": "Señales calibradas con WDI del Banco Mundial y proyecciones del Centro Wittgenstein.",
+  "dashboard.select_country": "Selecciona un país",
+  "dashboard.search_country": "Buscar país",
+  "dashboard.no_matches": "Sin coincidencias",
+  "dashboard.resilience_gauge": "Indicador de resiliencia",
+  "dashboard.resilience": "Resiliencia",
+  "dashboard.resilience_help": "Combina crecimiento del PIB, desempleo juvenil y participación laboral.",
+  "dashboard.education_transition": "Transición educativa",
+  "dashboard.education_transition_long": "Transición educativa (Proyecciones Wittgenstein)",
+  "dashboard.no_projection": "No hay datos de proyección para este país.",
+  "dashboard.calibrating": "Calibrando desde fuentes oficiales…",
+  "dashboard.ind.broadband_penetration": "Banda ancha (por 100)",
+  "dashboard.ind.internet_users_pct": "Usuarios de internet",
+  "dashboard.ind.mobile_cellular_subs": "Suscripciones móviles (por 100)",
+  "dashboard.ind.gdp_per_capita_ppp": "PIB per cápita (PPA)",
+  "dashboard.ind.unemployment_youth": "Desempleo juvenil",
+  "dashboard.ind.labor_force_participation": "Participación laboral",
+  "dashboard.ind.school_enrollment_tertiary": "Matrícula terciaria"
 }
