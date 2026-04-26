@@ -130,3 +130,15 @@ def assess_risk(
             for feat, w in explanation.as_list()
         ],
     }
+
+
+def predict_skill_risk(indicators: dict[str, Any], ilo_exposure: float) -> float:
+    """
+    Fast prediction for a single skill given pre-fetched WBG indicators and its raw ILO exposure.
+    Bypasses LIME and network calls for batch processing in SkillAssessor.
+    """
+    inds = indicators.copy()
+    inds["ilo_genai_exposure"] = ilo_exposure
+    feature_vec = np.array([build_feature_vector(inds)])
+    score = float(np.clip(risk_model.predict(feature_vec)[0], 0, 100))
+    return round(score, 2)
