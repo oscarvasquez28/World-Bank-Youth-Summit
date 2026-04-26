@@ -5,6 +5,7 @@ import SkillInput from "@/components/SkillInput";
 import Results from "@/components/Results";
 import Spinner from "@/components/ui/spinner";
 import { motion } from 'framer-motion';
+import storage from '@/lib/storage';
 import api from "@/lib/api";
 import "@/lib/api.routes";
 
@@ -18,8 +19,8 @@ export default function Home() {
 
   useEffect(() => {
     try {
-      const s = JSON.parse(localStorage.getItem('detectedSkills') || '[]');
-      const o = JSON.parse(localStorage.getItem('detectedOpportunities') || '[]');
+      const s = storage.getDetectedSkills();
+      const o = storage.getDetectedOpportunities();
       if (Array.isArray(s) && s.length) setSkills(s as string[]);
       if (Array.isArray(o) && o.length) setOpportunities(o as { role: string; salary: string }[]);
     } catch (e) {
@@ -52,9 +53,9 @@ export default function Home() {
       setSkills((prev) => {
         const merged = Array.from(new Set([...prev, ...detected]));
         try {
-          localStorage.setItem('detectedSkills', JSON.stringify(merged));
+          storage.appendDetectedSkills(detected);
         } catch (e) {
-          console.warn('Failed to write detected skills to localStorage', e);
+          console.warn('Failed to append detected skills to storage', e);
         }
         return merged;
       });
@@ -65,9 +66,9 @@ export default function Home() {
           if (!merged.find((m) => m.role === o.role && m.salary === o.salary)) merged.push(o);
         });
         try {
-          localStorage.setItem('detectedOpportunities', JSON.stringify(merged));
+          storage.appendDetectedOpportunities(opps);
         } catch (e) {
-          console.warn('Failed to write detected opportunities to localStorage', e);
+          console.warn('Failed to append detected opportunities to storage', e);
         }
         return merged;
       });
@@ -90,9 +91,9 @@ export default function Home() {
       setSkills((prev) => {
         const merged = Array.from(new Set([...prev, ...detected]));
         try {
-          localStorage.setItem('detectedSkills', JSON.stringify(merged));
+          storage.appendDetectedSkills(detected);
         } catch (e) {
-          console.warn('Failed to write detected skills to localStorage', e);
+          console.warn('Failed to append detected skills to storage', e);
         }
         return merged;
       });
@@ -103,9 +104,9 @@ export default function Home() {
           if (!merged.find((m) => m.role === o.role && m.salary === o.salary)) merged.push(o);
         });
         try {
-          localStorage.setItem('detectedOpportunities', JSON.stringify(merged));
+          storage.appendDetectedOpportunities(opps);
         } catch (e) {
-          console.warn('Failed to write detected opportunities to localStorage', e);
+          console.warn('Failed to append detected opportunities to storage', e);
         }
         return merged;
       });

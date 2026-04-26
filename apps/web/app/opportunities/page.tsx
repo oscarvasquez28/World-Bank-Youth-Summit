@@ -5,6 +5,7 @@ import Results from "@/components/Results";
 import { Badge } from "@/components/ui/badge";
 import { Card } from "@/components/ui/card";
 import { motion } from 'framer-motion';
+import storage from '@/lib/storage';
 import { onAuthChange, getUser } from '@/lib/auth';
 
 export default function OpportunitiesPage() {
@@ -15,8 +16,8 @@ export default function OpportunitiesPage() {
 
   useEffect(() => {
     try {
-      const s = JSON.parse(localStorage.getItem('detectedSkills') || '[]');
-      const o = JSON.parse(localStorage.getItem('detectedOpportunities') || '[]');
+      const s = storage.getDetectedSkills();
+      const o = storage.getDetectedOpportunities();
       setSkills(Array.isArray(s) ? s : []);
       setOpportunities(Array.isArray(o) ? o : []);
     } catch (e) {
@@ -34,10 +35,10 @@ export default function OpportunitiesPage() {
         setSelectedSkills([]);
         setSearchQuery('');
       } else {
-        // user logged in - rehydrate from storage
+        // user logged in - rehydrate from per-user storage
         try {
-          const s = JSON.parse(localStorage.getItem('detectedSkills') || '[]');
-          const o = JSON.parse(localStorage.getItem('detectedOpportunities') || '[]');
+          const s = storage.getDetectedSkills();
+          const o = storage.getDetectedOpportunities();
           setSkills(Array.isArray(s) ? s : []);
           setOpportunities(Array.isArray(o) ? o : []);
         } catch (e) {
