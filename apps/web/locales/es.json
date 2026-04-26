@@ -18,6 +18,12 @@
   ,"results.detected": "Habilidades detectadas",
   "results.no_skills": "Aún no se detectan habilidades.",
   "results.suggested": "Oportunidades sugeridas",
+  "results.no_resilience": "Aún no se detectan habilidades de resiliencia.",
+  "results.no_durable": "Aún no se detectan habilidades duraderas.",
+  "results.no_risks": "Aún no se detectan riesgos.",
+  "results.skills_at_risk": "Habilidades en riesgo",
+  "results.durable_skills": "Habilidades duraderas",
+  "results.resilience_pathways": "Caminos de resiliencia",
   "results.no_opps": "Aún no hay oportunidades.",
   "results.role_description": "Descripción breve de ejemplo para el rol."
   ,"opportunities.title": "Oportunidades"

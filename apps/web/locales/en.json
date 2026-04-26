@@ -19,6 +19,12 @@
   "results.no_skills": "No skills detected yet.",
   "results.suggested": "Suggested Opportunities",
   "results.no_opps": "No opportunities yet.",
+  "results.no_resilience": "No resilience skills detected yet.",
+  "results.no_durable": "No durable skills detected yet.",
+  "results.no_risks": "No risks detected yet.",
+  "results.skills_at_risk": "Skills at Risk",
+  "results.durable_skills": "Durable Skills",
+  "results.resilience_pathways": "Resilience Pathways",
   "results.role_description": "Brief description placeholder for the role."
   ,"opportunities.title": "Opportunities"
   ,"opportunities.search_placeholder": "Search skills..."

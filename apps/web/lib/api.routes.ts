@@ -7,6 +7,9 @@ api.register('analyze', { path: '/analyze', method: 'POST' });
 api.register('authRegister', { path: '/auth/register', method: 'POST' });
 api.register('authSignin', { path: '/auth/signin', method: 'POST' });
 
+// Risk lens endpoint: returns skills_at_risk, durable_skills, resilience_pathways
+api.register('lens', { path: '/lens', method: 'POST' });
+
 // Register additional endpoints here as needed
 
 export default {};

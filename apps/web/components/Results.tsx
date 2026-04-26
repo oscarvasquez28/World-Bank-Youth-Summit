@@ -16,7 +16,15 @@ type Props = {
   opportunities: Opportunity[];
 };
 
-export default function Results({ skills, opportunities }: Props) {
+type LensSkill = { skill: string; risk_score?: number };
+
+type Lens = {
+  skills_at_risk?: string[] | LensSkill[];
+  durable_skills?: LensSkill[];
+  resilience_pathways?: LensSkill[];
+};
+
+export default function Results({ skills, opportunities, lens }: Props & { lens?: Lens | null }) {
   const { t } = useI18n();
   const container = {
     hidden: { opacity: 0, y: 8 },
@@ -38,6 +46,60 @@ export default function Results({ skills, opportunities }: Props) {
             <Badge key={`${s}-${idx}`}>{s}</Badge>
           ))}
         </motion.div>
+
+        {/* Lens sections (skills at risk, durable skills, resilience pathways) */}
+        {lens && (
+          <>
+            <motion.h3 variants={item} className="mb-3 mt-2 text-lg font-semibold dark:text-zinc-100">{t('results.skills_at_risk') || 'Skills At Risk'}</motion.h3>
+            <motion.div variants={item} className="mb-4 flex flex-wrap gap-2">
+              {Array.isArray(lens.skills_at_risk) && lens.skills_at_risk.length === 0 && (
+                <p className="text-sm text-zinc-500 dark:text-zinc-400">{t('results.no_risks') || 'No skills at risk identified.'}</p>
+              )}
+              {Array.isArray(lens.skills_at_risk) && lens.skills_at_risk.map((s: any, i) => {
+                const label = typeof s === 'string' ? s : s.skill || String(s);
+                return (
+                  <Badge key={`risk-${label}-${i}`} className="bg-rose-100 text-rose-800 dark:bg-rose-800 dark:text-rose-100">
+                    {label}
+                  </Badge>
+                );
+              })}
+            </motion.div>
+
+            <motion.h3 variants={item} className="mb-3 mt-2 text-lg font-semibold dark:text-zinc-100">{t('results.durable_skills') || 'Durable Skills'}</motion.h3>
+            <motion.div variants={item} className="mb-4 flex flex-wrap gap-2">
+              {Array.isArray(lens.durable_skills) && lens.durable_skills.length === 0 && (
+                <p className="text-sm text-zinc-500 dark:text-zinc-400">{t('results.no_durable') || 'No durable skills identified.'}</p>
+              )}
+              {Array.isArray(lens.durable_skills) && lens.durable_skills.map((s) => (
+                <Badge key={`durable-${s.skill}`} className="bg-emerald-100 text-emerald-800 dark:bg-emerald-900 dark:text-emerald-200">
+                  <div className="flex items-center gap-2">
+                    <span>{s.skill}</span>
+                    {typeof s.risk_score === 'number' && (
+                      <span className="ml-2 text-xs font-medium text-zinc-600 dark:text-zinc-300">{s.risk_score.toFixed(1)}%</span>
+                    )}
+                  </div>
+                </Badge>
+              ))}
+            </motion.div>
+
+            <motion.h3 variants={item} className="mb-3 mt-2 text-lg font-semibold dark:text-zinc-100">{t('results.resilience_pathways') || 'Resilience Pathways'}</motion.h3>
+            <motion.div variants={item} className="mb-4 flex flex-wrap gap-2">
+              {Array.isArray(lens.resilience_pathways) && lens.resilience_pathways.length === 0 && (
+                <p className="text-sm text-zinc-500 dark:text-zinc-400">{t('results.no_resilience') || 'No resilience pathways identified.'}</p>
+              )}
+              {Array.isArray(lens.resilience_pathways) && lens.resilience_pathways.map((s) => (
+                <Badge key={`res-${s.skill}`} className="bg-sky-100 text-sky-800 dark:bg-sky-900 dark:text-sky-200">
+                  <div className="flex items-center gap-2">
+                    <span>{s.skill}</span>
+                    {typeof s.risk_score === 'number' && (
+                      <span className="ml-2 text-xs font-medium text-zinc-600 dark:text-zinc-300">{s.risk_score.toFixed(1)}%</span>
+                    )}
+                  </div>
+                </Badge>
+              ))}
+            </motion.div>
+          </>
+        )}
 
         <motion.h3 variants={item} className="mb-3 mt-2 text-lg font-semibold dark:text-zinc-100">{t('results.suggested')}</motion.h3>
         <motion.div variants={item} className="grid gap-4 md:grid-cols-2">
