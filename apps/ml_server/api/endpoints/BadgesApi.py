@@ -16,6 +16,8 @@ from pydantic import BaseModel, Field
 from ml_engine.openbadges import (
     Achievement,
     AchievementSubject,
+    AlignmentObject,
+    Criteria,
     OpenBadgeCredential,
     Profile,
 )
@@ -38,6 +40,7 @@ class BadgeSkill(BaseModel):
 
     name: str = Field(..., description="Canonical skill label (e.g. from ESCO)")
     description: str | None = Field(default=None, description="Optional elaboration")
+    uri: str | None = Field(default=None, description="Optional ESCO URI for alignment")
 
 
 class BadgeRequest(BaseModel):
@@ -48,6 +51,9 @@ class BadgeRequest(BaseModel):
         ...,
         description="Unique identifier for the earner (e.g. email URI or DID)",
         json_schema_extra={"example": "did:example:user123"},
+    )
+    isced_level: int = Field(
+        ..., ge=0, le=8, description="ISCED education level (0-8)"
     )
     skills: list[BadgeSkill] = Field(
         ...,
@@ -94,7 +100,40 @@ async def issue_badge(payload: BadgeRequest) -> BadgeResponse:
     construct JSON-LD schemas (per project rules).
     """
     try:
-        # 1. Issuer profile
+        # 1. Skill & Education Alignments (for portability across borders/sectors)
+        alignments = []
+        for s in payload.skills:
+            if s.uri:
+                alignments.append(
+                    AlignmentObject(
+                        targetName=s.name,
+                        targetUrl=s.uri,
+                        targetFramework="ESCO"
+                    )
+                )
+        
+        # Add ISCED education level alignment
+        isced_desc = {
+            0: "Early childhood education",
+            1: "Primary education",
+            2: "Lower secondary education",
+            3: "Upper secondary education",
+            4: "Post-secondary non-tertiary education",
+            5: "Short-cycle tertiary education",
+            6: "Bachelor’s or equivalent",
+            7: "Master’s or equivalent",
+            8: "Doctoral or equivalent"
+        }.get(payload.isced_level, "N/A")
+
+        alignments.append(
+            AlignmentObject(
+                targetName=f"ISCED Level {payload.isced_level}: {isced_desc}",
+                targetUrl="https://uis.unesco.org/en/topic/international-standard-classification-education-isced",
+                targetFramework="ISCED"
+            )
+        )
+
+        # 2. Issuer profile
         issuer = Profile(
             id=_settings.ISSUER_ID,
             type="Profile",
@@ -102,20 +141,30 @@ async def issue_badge(payload: BadgeRequest) -> BadgeResponse:
             url=_settings.ISSUER_URL,
         )
 
-        # 2. Achievement – embeds all skills in the description
+        # 3. Explainable Narrative (for non-expert users)
+        explainable_narrative = (
+            f"This Skills Passport recognizes {payload.recipient_name}'s competencies. "
+            f"Based on an education level of ISCED {payload.isced_level} ({isced_desc}) "
+            "and verified skill extraction, this profile is designed to be portable "
+            "and readable by both humans and AI systems."
+        )
+
         skills_summary = "; ".join(
-            s.name + (f" – {s.description}" if s.description else "")
+            s.name + (f" ({s.description})" if s.description else "")
             for s in payload.skills
         )
+
         achievement = Achievement(
             id=f"{_settings.ISSUER_URL}/achievements/{uuid.uuid4()}",
             type="Achievement",
             name=payload.badge_name,
-            description=f"{payload.badge_description}\n\nSkills: {skills_summary}",
+            description=f"{payload.badge_description}\n\n{explainable_narrative}\n\nSkills: {skills_summary}",
             issuer=issuer,
+            alignment=alignments if alignments else None,
+            criteria=Criteria(narrative=f"Verified through the UNMAPPED Skills Signal Engine for recipient {payload.recipient_id}.")
         )
 
-        # 3. Credential (Verifiable Credential envelope)
+        # 4. Credential (Verifiable Credential envelope)
         credential = OpenBadgeCredential(
             id=f"{_settings.ISSUER_URL}/credentials/{uuid.uuid4()}",
             type=["VerifiableCredential", "OpenBadgeCredential"],
@@ -125,11 +174,12 @@ async def issue_badge(payload: BadgeRequest) -> BadgeResponse:
                 id=payload.recipient_id,
                 type="AchievementSubject",
                 achievement=achievement,
+                name=payload.recipient_name
             ),
         )
 
         # Serialize through Pydantic → dict (JSON-LD compatible)
-        credential_dict = credential.model_dump(mode="json", exclude_none=True)
+        credential_dict = credential.model_dump(mode="json", exclude_none=True, by_alias=True)
 
     except Exception as exc:
         logger.exception("Badge issuance failed")

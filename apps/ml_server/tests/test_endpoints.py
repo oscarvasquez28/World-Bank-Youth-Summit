@@ -192,8 +192,13 @@ class TestBadgesEndpoint:
             json={
                 "recipient_name": "Jane Doe",
                 "recipient_id": "did:example:jane123",
+                "isced_level": 6,
                 "skills": [
-                    {"name": "Communication", "description": "Verbal and written"},
+                    {
+                        "name": "Communication", 
+                        "description": "Verbal and written",
+                        "uri": "http://data.europa.eu/esco/skill/communication"
+                    },
                     {"name": "Data Analysis"},
                 ],
             },
@@ -204,6 +209,12 @@ class TestBadgesEndpoint:
         cred = body["credential"]
         assert "VerifiableCredential" in cred["type"]
         assert "OpenBadgeCredential" in cred["type"]
+        
+        # Verify alignment was created for the skill with a URI
+        achievement = cred["credentialSubject"]["achievement"]
+        assert "alignment" in achievement
+        assert achievement["alignment"][0]["targetUrl"] == "http://data.europa.eu/esco/skill/communication"
+        assert achievement["alignment"][0]["targetFramework"] == "ESCO"
 
     def test_issue_badge_no_skills_returns_422(self):
         resp = client.post(
@@ -211,6 +222,7 @@ class TestBadgesEndpoint:
             json={
                 "recipient_name": "Jane Doe",
                 "recipient_id": "did:example:jane123",
+                "isced_level": 3,
                 "skills": [],
             },
         )
