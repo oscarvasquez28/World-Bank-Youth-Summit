@@ -35,6 +35,7 @@ type Props = {
   lens?: Lens | null;
   occupations?: Record<string, OccupationInfo> | null;
   credential?: Record<string, any> | null;
+  education?: number | null;
 };
 
 const titleCase = (v: string) =>
@@ -56,6 +57,22 @@ function extractCredential(lens?: Lens | null, credential?: Record<string, any> 
 export default function Results({ skills, opportunities, lens, occupations, credential }: Props) {
   const { t } = useI18n();
   const passportCredential = extractCredential(lens, credential);
+  
+  const iscedLabel = (lvl?: number | null) => {
+    if (lvl === null || typeof lvl !== 'number') return '-';
+    const map: Record<number, string> = {
+      0: t('education.options.ISCED_0'),
+      1: t('education.options.ISCED_1'),
+      2: t('education.options.ISCED_2'),
+      3: t('education.options.ISCED_3'),
+      4: t('education.options.ISCED_4'),
+      5: t('education.options.ISCED_5'),
+      6: t('education.options.ISCED_6'),
+      7: t('education.options.ISCED_7'),
+      8: t('education.options.ISCED_8'),
+    };
+    return map[lvl] || String(lvl);
+  };
 
   return (
     <div className="mt-8 w-full">
@@ -139,6 +156,9 @@ export default function Results({ skills, opportunities, lens, occupations, cred
                 <div className="flex items-start justify-between gap-4">
                   <div>
                     <div className="text-sm font-semibold">{titleCase(name)}</div>
+                    {typeof info?.isced_level === 'number' && (
+                      <div className="text-xs text-zinc-500 dark:text-zinc-400">{t('results.isced_required').replace('{{level}}', iscedLabel(info?.isced_level))}</div>
+                    )}
                   </div>
                   <div className="ml-auto flex items-center">
                     <div className="flex h-12 w-12 items-center justify-center rounded-full bg-sky-100 dark:bg-sky-900">
@@ -147,6 +167,16 @@ export default function Results({ skills, opportunities, lens, occupations, cred
                   </div>
                 </div>
                 <div className="text-sm text-zinc-500 dark:text-zinc-400">{info?.description || t("results.role_description")}</div>
+                {Array.isArray(info?.missing_essential_skills) && info!.missing_essential_skills!.length > 0 && (
+                  <div className="mt-3">
+                    <div className="text-xs font-semibold text-zinc-700 dark:text-zinc-300">{t('results.missing_essential_skills')}:</div>
+                    <ul className="mt-1 ml-3 list-disc text-sm text-zinc-500 dark:text-zinc-400">
+                      {info!.missing_essential_skills!.map((m, i) => (
+                        <li key={`${name}-miss-${i}`}>{m}</li>
+                      ))}
+                    </ul>
+                  </div>
+                )}
               </Card>
             ))}
           {(!occupations || Object.keys(occupations).length === 0) && (

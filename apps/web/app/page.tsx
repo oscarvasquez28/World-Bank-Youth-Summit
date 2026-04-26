@@ -27,6 +27,7 @@ export default function Home() {
   const [lensData, setLensData] = useState<any | null>(null);
   const [occupationsData, setOccupationsData] = useState<Record<string, any> | null>(null);
   const [credentialData, setCredentialData] = useState<any | null>(null);
+  const [education, setEducation] = useState<number | null>(null);
   const [error, setError] = useState<string | null>(null);
 
   const { t } = useI18n();
@@ -42,7 +43,7 @@ export default function Home() {
     }
   }, []);
 
-  function mockAnalyze(text: string, country: string) {
+  function mockAnalyze(text: string, country: string, educationParam: number | null = null) {
     setLoading(true);
 
     // simple mock: extract words longer than 3 letters and treat some as skills
@@ -79,6 +80,7 @@ export default function Home() {
           skills: detectedRaw,
           country,
           top_n: 10,
+          education_level: educationParam,
         });
         setOccupationsData(occupations || null);
         try {
@@ -115,7 +117,7 @@ export default function Home() {
     }, 900);
   }
 
-  async function analyzeRemote(text: string, country: string) {
+  async function analyzeRemote(text: string, country: string, educationParam: number | null = null) {
     setLoading(true);
     setError(null);
     try {
@@ -145,6 +147,7 @@ export default function Home() {
           skills: detectedRaw,
           country,
           top_n: 10,
+          education_level: educationParam,
         });
         setOccupationsData(occupations || null);
         try {
@@ -198,9 +201,11 @@ export default function Home() {
 
             <div className="rounded-xl border border-neutral-100 bg-white p-6 shadow-sm dark:border-neutral-700 dark:bg-zinc-800">
               <SkillInput
-                onAnalyze={(text, country) => {
+                onAnalyze={(text, country, edu) => {
+                  // remember selected education for results display
+                  setEducation(edu);
                   // prefer remote API; fallback to mock if API unreachable
-                  analyzeRemote(text, country).catch(() => mockAnalyze(text, country));
+                  analyzeRemote(text, country, edu).catch(() => mockAnalyze(text, country, edu));
                 }}
               />
 
@@ -226,6 +231,7 @@ export default function Home() {
               lens={lensData}
               occupations={occupationsData}
               credential={credentialData}
+              education={education}
             />
           </div>
         )}

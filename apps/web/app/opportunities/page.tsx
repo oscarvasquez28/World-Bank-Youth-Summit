@@ -27,6 +27,7 @@ export default function OpportunitiesPage() {
   const [occupationsBySkill, setOccupationsBySkill] = useState<Record<string, OccupationsResponse>>({});
   const [searchQuery, setSearchQuery] = useState<string>("");
   const [selectedSkills, setSelectedSkills] = useState<string[]>([]);
+  const [education, setEducation] = useState<number | null>(null);
 
   const uniqueSkills = Array.from(new Set(skills.map((s) => String(s || '').trim()).filter(Boolean)));
   const titleCase = (v: string) =>
@@ -34,6 +35,22 @@ export default function OpportunitiesPage() {
       .toLowerCase()
       .replace(/\b\w/g, (c) => c.toUpperCase());
   const formatRawPercentage = (v?: number) => (typeof v === 'number' ? `${Number(v.toFixed(2))}%` : '-');
+
+  const iscedLabel = (lvl?: number | null) => {
+    if (lvl === null || typeof lvl !== 'number') return '-';
+    const map: Record<number, string> = {
+      0: t('education.options.ISCED_0'),
+      1: t('education.options.ISCED_1'),
+      2: t('education.options.ISCED_2'),
+      3: t('education.options.ISCED_3'),
+      4: t('education.options.ISCED_4'),
+      5: t('education.options.ISCED_5'),
+      6: t('education.options.ISCED_6'),
+      7: t('education.options.ISCED_7'),
+      8: t('education.options.ISCED_8'),
+    };
+    return map[lvl] || String(lvl);
+  };
 
   const filteredSideSkills = uniqueSkills.filter((s) => s.toLowerCase().includes(searchQuery.trim().toLowerCase()));
 
@@ -161,8 +178,9 @@ export default function OpportunitiesPage() {
             try {
               const occ = await api.occupations({
                 skills: [skill],
-                country: 'US',
+                country: localStorage.getItem('unmapped_locale')  == "en" ? "US" : "MX",
                 top_n: 10,
+                education_level: education,
               });
               const out = occ && typeof occ === 'object' ? (occ as OccupationsResponse) : {};
               return [skill, out] as const;
@@ -226,8 +244,27 @@ export default function OpportunitiesPage() {
                     className="w-full rounded-md border border-neutral-100 px-3 py-2 text-sm shadow-sm bg-white placeholder:text-zinc-500 focus:outline-none focus:ring-2 focus:ring-primary/50 dark:border-neutral-700 dark:bg-zinc-700 dark:text-zinc-100 dark:placeholder:text-zinc-400"
                   />
                 </div>
+                <div className="mt-3">
+                  <label className="text-sm text-zinc-600 dark:text-zinc-300">{t('education.label')}</label>
+                  <select
+                    value={education === null ? '' : String(education)}
+                    onChange={(e) => setEducation(e.target.value === '' ? null : Number(e.target.value))}
+                    className="mt-3 w-full rounded-md border border-neutral-100 px-3 py-2 text-sm shadow-sm bg-white placeholder:text-zinc-500 focus:outline-none focus:ring-2 focus:ring-primary/50 dark:border-neutral-700 dark:bg-zinc-700 dark:text-zinc-100"
+                  >
+                    <option value="">{t('education.placeholder')}</option>
+                    <option value="0">{t('education.options.ISCED_0')}</option>
+                    <option value="1">{t('education.options.ISCED_1')}</option>
+                    <option value="2">{t('education.options.ISCED_2')}</option>
+                    <option value="3">{t('education.options.ISCED_3')}</option>
+                    <option value="4">{t('education.options.ISCED_4')}</option>
+                    <option value="5">{t('education.options.ISCED_5')}</option>
+                    <option value="6">{t('education.options.ISCED_6')}</option>
+                    <option value="7">{t('education.options.ISCED_7')}</option>
+                    <option value="8">{t('education.options.ISCED_8')}</option>
+                  </select>
+                </div>
 
-                <div className="flex flex-wrap gap-2">
+                <div className="flex flex-wrap gap-2 mt-4">
                   {uniqueSkills.length === 0 && <p className="text-sm text-zinc-500">{t('opportunities.no_skills_saved')}</p>}
                   {filteredSideSkills.map((s, idx) => {
                     const active = selectedSkills.includes(s);
@@ -261,6 +298,9 @@ export default function OpportunitiesPage() {
                                 <div className="flex items-start justify-between gap-4">
                                   <div>
                                     <div className="text-sm font-semibold">{titleCase(name)}</div>
+                                    {typeof info?.isced_level === 'number' && (
+                                      <div className="text-xs text-zinc-500 dark:text-zinc-400">{t('results.isced_required').replace('{{level}}', iscedLabel(info?.isced_level))}</div>
+                                    )}
                                   </div>
                                   <div className="ml-auto flex items-center">
                                     <div className="flex h-12 w-12 items-center justify-center rounded-full bg-emerald-100 dark:bg-emerald-900">
@@ -269,6 +309,16 @@ export default function OpportunitiesPage() {
                                   </div>
                                 </div>
                                 <div className="text-sm text-zinc-500 dark:text-zinc-400">{info?.description || t('results.role_description')}</div>
+                                {Array.isArray(info?.missing_essential_skills) && info!.missing_essential_skills!.length > 0 && (
+                                  <div className="mt-3">
+                                    <div className="text-xs font-semibold text-zinc-700 dark:text-zinc-300">{t('results.missing_essential_skills')}:</div>
+                                    <ul className="mt-1 ml-3 list-disc text-sm text-zinc-500 dark:text-zinc-400">
+                                      {info!.missing_essential_skills!.map((m, i) => (
+                                        <li key={`${skill}-${name}-miss-${i}`}>{m}</li>
+                                      ))}
+                                    </ul>
+                                  </div>
+                                )}
                               </Card>
                             ))}
                             {rows.length === 0 && <p className="text-sm text-zinc-500 dark:text-zinc-400">{t('opportunities.no_for_skill')}</p>}
@@ -286,12 +336,27 @@ export default function OpportunitiesPage() {
                         return (
                           <Card key={`${skill}-${name}`} className="relative flex flex-col gap-3 p-4 shadow-sm hover:shadow-md dark:shadow-none">
                             <div className="flex items-start justify-between gap-4">
-                              <div className="text-sm font-semibold">{titleCase(name)}</div>
+                              <div>
+                                <div className="text-sm font-semibold">{titleCase(name)}</div>
+                                {typeof info?.isced_level === 'number' && (
+                                  <div className="text-xs text-zinc-500 dark:text-zinc-400">{t('results.isced_required').replace('{{level}}', iscedLabel(info?.isced_level))}</div>
+                                )}
+                              </div>
                               <div className="flex h-12 w-12 items-center justify-center rounded-full bg-sky-100 dark:bg-sky-900">
                                 <div className="text-sm font-semibold text-sky-700 dark:text-sky-200">{formatRawPercentage(info?.matching_percentage)}</div>
                               </div>
                             </div>
                             <div className="text-sm text-zinc-500 dark:text-zinc-400">{info?.description || t('results.role_description')}</div>
+                            {Array.isArray(info?.missing_essential_skills) && info!.missing_essential_skills!.length > 0 && (
+                              <div className="mt-3">
+                                <div className="text-xs font-semibold text-zinc-700 dark:text-zinc-300">{t('results.missing_essential_skills')}:</div>
+                                <ul className="mt-1 ml-3 list-disc text-sm text-zinc-500 dark:text-zinc-400">
+                                  {info!.missing_essential_skills!.map((m, i) => (
+                                    <li key={`${skill}-${name}-miss-main-${i}`}>{m}</li>
+                                  ))}
+                                </ul>
+                              </div>
+                            )}
                           </Card>
                         );
                       })}
