@@ -325,6 +325,8 @@ def match_occupations(
     occ_total_skill_counts = data["occ_total_skill_counts"]
     uri_to_skill_label = data["uri_to_skill_label"]
 
+    uri_to_isco_group = data["uri_to_isco_group"]
+
     if df_relations.empty:
         return []
 
@@ -362,12 +364,42 @@ def match_occupations(
         # Translate matching skill URIs to labels
         matching_skill_labels = [uri_to_skill_label.get(s_uri, s_uri) for s_uri in matched_skill_uris]
 
+        # Determine opportunity type and ISCED level based on ISCO group
+        isco_val = uri_to_isco_group.get(occ_uri)
+        opportunity_type = "Formal Employment"
+        isced_level = 3  # Default to Upper Secondary
+        
+        if pd.notna(isco_val):
+            isco_prefix = str(isco_val)[0]
+            
+            # Opportunity Type
+            if isco_prefix in ("5", "6", "7"):
+                opportunity_type = "Self-Employment"
+            elif isco_prefix == "9":
+                opportunity_type = "Gig"
+            
+            # ISCED Level Heuristic
+            isco_isced_map = {
+                "1": 6, # Managers -> Bachelor's
+                "2": 6, # Professionals -> Bachelor's
+                "3": 5, # Technicians -> Short-cycle tertiary
+                "4": 3, # Clerks -> Upper secondary
+                "5": 3, # Service/Sales -> Upper secondary
+                "6": 2, # Agriculture -> Lower secondary
+                "7": 2, # Crafts -> Lower secondary
+                "8": 2, # Operators -> Lower secondary
+                "9": 1, # Elementary -> Primary
+            }
+            isced_level = isco_isced_map.get(isco_prefix, 3)
+
         results.append({
             "occupation": label,
             "occupation_uri": occ_uri,
             "matching_skills": matching_skill_labels,
             "description": description,
             "matching_percentage": round(float(matching_percentage), 2),
+            "opportunity_type": opportunity_type,
+            "isced_level": isced_level,
         })
 
     return results
