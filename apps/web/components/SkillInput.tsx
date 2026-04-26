@@ -16,7 +16,7 @@ export default function SkillInput({ onAnalyze }: Props) {
   return (
     <div className="w-full max-w-3xl mx-auto">
       <Textarea
-        label="Describe your skills"
+        label="Describe your informal experience and demonstrated competences"
         placeholder="I help customers and use Excel to build reports..."
         value={text}
         onChange={(e) => setText(e.target.value)}

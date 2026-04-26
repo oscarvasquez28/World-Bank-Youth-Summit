@@ -34,8 +34,8 @@ export default function Navbar() {
   }, [])
 
   return (
-    <header className="w-full">
-      <div className="mx-auto flex h-16 max-w-7xl items-center px-6 text-zinc-900 dark:text-zinc-100">
+    <header className="w-full fixed top-0 left-0 right-0 z-50">
+      <div className="mx-auto flex h-16 max-w-7xl items-center px-6 text-zinc-900 dark:text-zinc-100 backdrop-blur-sm bg-white/60 dark:bg-black/60 border-b border-transparent dark:border-neutral-800">
         <div className="flex items-center gap-3">
           <svg width="290" height="56" viewBox="0 0 290 56" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden className="h-10 w-auto text-zinc-900 dark:text-zinc-100">
             <g transform="translate(8 8)">
