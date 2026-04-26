@@ -189,6 +189,9 @@ app.post('/occupations', async (req, res) => {
 		const top_n_input = (body as any).top_n ?? (body as any).topN;
 		const top_n = Number.isFinite(Number(top_n_input)) ? Number(top_n_input) : 10;
 
+		const education_level_input = (body as any).education_level ?? null;
+		const education_level = education_level_input === null ? null : Number.isFinite(Number(education_level_input)) ? Number(education_level_input) : null;
+
 		try {
 			const modelRes = await fetch('http://127.0.0.1:8000/api/risk/occupations', {
 				method: 'POST',
@@ -198,6 +201,7 @@ app.post('/occupations', async (req, res) => {
 					country_code,
 					locale: country_code,
 					top_n,
+					education_level,
 				}),
 			});
 
