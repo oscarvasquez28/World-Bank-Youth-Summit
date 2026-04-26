@@ -36,6 +36,10 @@ export default function Results({ skills, opportunities, lens }: Props & { lens?
     show: { opacity: 1, y: 0, transition: { type: 'spring', stiffness: 300, damping: 20 } },
   };
 
+  const titleCase = (v: any) => String(v || '')
+	.toLowerCase()
+	.replace(/\b\w/g, (c) => c.toUpperCase());
+
   return (
     <motion.div initial="hidden" animate="show" variants={container} className="mt-8 w-full">
       <Card>
@@ -73,7 +77,7 @@ export default function Results({ skills, opportunities, lens }: Props & { lens?
               {Array.isArray(lens.durable_skills) && lens.durable_skills.map((s) => (
                 <Badge key={`durable-${s.skill}`} className="bg-emerald-100 text-emerald-800 dark:bg-emerald-900 dark:text-emerald-200">
                   <div className="flex items-center gap-2">
-                    <span>{s.skill}</span>
+                    <span>{titleCase(s.skill)}</span>
                     {typeof s.risk_score === 'number' && (
                       <span className="ml-2 text-xs font-medium text-zinc-600 dark:text-zinc-300">{s.risk_score.toFixed(1)}%</span>
                     )}
@@ -90,7 +94,7 @@ export default function Results({ skills, opportunities, lens }: Props & { lens?
               {Array.isArray(lens.resilience_pathways) && lens.resilience_pathways.map((s) => (
                 <Badge key={`res-${s.skill}`} className="bg-sky-100 text-sky-800 dark:bg-sky-900 dark:text-sky-200">
                   <div className="flex items-center gap-2">
-                    <span>{s.skill}</span>
+                    <span>{titleCase(s.skill)}</span>
                     {typeof s.risk_score === 'number' && (
                       <span className="ml-2 text-xs font-medium text-zinc-600 dark:text-zinc-300">{s.risk_score.toFixed(1)}%</span>
                     )}
@@ -108,7 +112,7 @@ export default function Results({ skills, opportunities, lens }: Props & { lens?
               <Card className="relative flex flex-col gap-3 p-4 shadow-sm hover:shadow-md dark:shadow-none">
                 <div className="flex items-start justify-between gap-4">
                   <div>
-                    <div className="text-sm font-semibold">{o.role}</div>
+                    <div className="text-sm font-semibold">{titleCase(o.role)}</div>
                   </div>
                   <div className="ml-auto flex items-center">
                     <div className="flex h-12 w-12 items-center justify-center rounded-full bg-emerald-100 dark:bg-emerald-900">

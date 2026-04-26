@@ -100,7 +100,6 @@ export default function Home() {
     try {
       const data = await api.analyze({ text, country });
       let detected = data.skills || [];
-      detected = detected.map(titleCase);
       const opps: { role: string; salary?: string }[] = data.opportunities || [];
 
       // current results - only these should be shown on Discover
