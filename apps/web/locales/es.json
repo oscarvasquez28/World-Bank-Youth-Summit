@@ -56,6 +56,7 @@
   ,"results.sector_growth": "Crecimiento del sector"
   ,"results.wage_signal": "Salario estimado"
   ,"results.no_data": "Sin datos"
+  ,"footer.esco_attribution": "Este servicio utiliza la clasificación ESCO de la Comisión Europea."
   ,"badge.issued_to": "Emitido a"
   ,"badge.issued_on": "Emitido el"
   ,"badge.uid": "ID de credencial"
