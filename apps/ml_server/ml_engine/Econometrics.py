@@ -128,19 +128,29 @@ def fetch_education_projections(country_code: str) -> dict[str, Any]:
     return {"country": country_name, "projections": projections}
 
 
+# The specific subset of indicators the scikit-learn model was trained on.
+RISK_MODEL_FEATURES = [
+    "broadband_penetration",
+    "internet_users_pct",
+    "mobile_cellular_subs",
+    "gdp_per_capita_ppp",
+    "unemployment_youth",
+    "labor_force_participation",
+    "school_enrollment_tertiary",
+]
+
+
 def build_feature_vector(indicators: dict[str, Any]) -> list[float]:
     """
     Convert the indicator dict into a flat numeric vector suitable for the
     scikit-learn risk model.  Missing values are imputed as 0.0.
-
-    The order is deterministic (same as ``INDICATOR_MAP`` insertion order).
     """
-    vec = [float(indicators.get(name) or 0.0) for name in INDICATOR_MAP]
+    vec = [float(indicators.get(name) or 0.0) for name in RISK_MODEL_FEATURES]
     vec.append(float(indicators.get("ilo_genai_exposure") or 0.0))
     return vec
 
 
 def get_feature_names() -> list[str]:
     """Return ordered feature names matching ``build_feature_vector``."""
-    return list(INDICATOR_MAP.keys()) + ["ilo_genai_exposure"]
+    return RISK_MODEL_FEATURES + ["ilo_genai_exposure"]
 

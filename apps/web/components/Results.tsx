@@ -3,6 +3,7 @@
 import React from "react";
 import { Badge } from "@/components/ui/badge";
 import { Card } from "@/components/ui/card";
+import PassportCard from "@/components/PassportCard";
 import { useI18n } from "@/lib/i18n";
 
 type Opportunity = {
@@ -22,6 +23,10 @@ type Lens = {
   skills_at_risk?: string[] | LensSkill[];
   durable_skills?: LensSkill[];
   resilience_pathways?: LensSkill[];
+  credential?: Record<string, any>;
+  passport?: Record<string, any>;
+  jsonld?: Record<string, any>;
+  credentials?: Array<Record<string, any>>;
 };
 
 type Props = {
@@ -29,6 +34,7 @@ type Props = {
   opportunities: Opportunity[];
   lens?: Lens | null;
   occupations?: Record<string, OccupationInfo> | null;
+  credential?: Record<string, any> | null;
 };
 
 const titleCase = (v: string) =>
@@ -37,12 +43,29 @@ const titleCase = (v: string) =>
     .replace(/\b\w/g, (c) => c.toUpperCase());
 const formatRawPercentage = (v?: number) => (typeof v === "number" ? `${Number(v.toFixed(2))}%` : "-");
 
-export default function Results({ skills, opportunities, lens, occupations }: Props) {
+function extractCredential(lens?: Lens | null, credential?: Record<string, any> | null) {
+  if (credential && typeof credential === 'object') return credential;
+  if (!lens) return null;
+  if (lens.credential && typeof lens.credential === 'object') return lens.credential;
+  if (lens.passport && typeof lens.passport === 'object') return lens.passport;
+  if (lens.jsonld && typeof lens.jsonld === 'object') return lens.jsonld;
+  if (Array.isArray(lens.credentials) && lens.credentials[0] && typeof lens.credentials[0] === 'object') return lens.credentials[0];
+  return null;
+}
+
+export default function Results({ skills, opportunities, lens, occupations, credential }: Props) {
   const { t } = useI18n();
+  const passportCredential = extractCredential(lens, credential);
 
   return (
     <div className="mt-8 w-full">
       <Card>
+        {passportCredential && (
+          <div className="mb-6">
+            <PassportCard credential={passportCredential} />
+          </div>
+        )}
+
         <h3 className="mb-3 text-lg font-semibold dark:text-zinc-100">{t("results.detected")}</h3>
         <div className="mb-4 flex flex-wrap gap-2">
           {skills.length === 0 && <p className="text-sm text-zinc-500 dark:text-zinc-400">{t("results.no_skills")}</p>}
@@ -111,23 +134,21 @@ export default function Results({ skills, opportunities, lens, occupations }: Pr
         <div className="grid gap-4 md:grid-cols-2">
           {occupations &&
             Object.keys(occupations).length > 0 &&
-            Object.entries(occupations).map(([name, info], idx) => {
-              return (
-                <Card key={`${name}-${idx}`} className="relative flex flex-col gap-3 p-4 shadow-sm hover:shadow-md dark:shadow-none">
-                  <div className="flex items-start justify-between gap-4">
-                    <div>
-                      <div className="text-sm font-semibold">{titleCase(name)}</div>
-                    </div>
-                    <div className="ml-auto flex items-center">
-                      <div className="flex h-12 w-12 items-center justify-center rounded-full bg-sky-100 dark:bg-sky-900">
-                        <div className="text-sm font-semibold text-sky-700 dark:text-sky-200">{formatRawPercentage(info?.matching_percentage)}</div>
-                      </div>
+            Object.entries(occupations).map(([name, info], idx) => (
+              <Card key={`${name}-${idx}`} className="relative flex flex-col gap-3 p-4 shadow-sm hover:shadow-md dark:shadow-none">
+                <div className="flex items-start justify-between gap-4">
+                  <div>
+                    <div className="text-sm font-semibold">{titleCase(name)}</div>
+                  </div>
+                  <div className="ml-auto flex items-center">
+                    <div className="flex h-12 w-12 items-center justify-center rounded-full bg-sky-100 dark:bg-sky-900">
+                      <div className="text-sm font-semibold text-sky-700 dark:text-sky-200">{formatRawPercentage(info?.matching_percentage)}</div>
                     </div>
                   </div>
-                  <div className="text-sm text-zinc-500 dark:text-zinc-400">{info?.description || t("results.role_description")}</div>
-                </Card>
-              );
-            })}
+                </div>
+                <div className="text-sm text-zinc-500 dark:text-zinc-400">{info?.description || t("results.role_description")}</div>
+              </Card>
+            ))}
           {(!occupations || Object.keys(occupations).length === 0) && (
             <p className="text-sm text-zinc-500 dark:text-zinc-400">{t("results.no_occupations")}</p>
           )}

@@ -91,6 +91,9 @@ class LensResponse(BaseModel):
 
 
 class OccupationsRequest(BaseModel):
+    country_code: str = Field(
+        ..., min_length=3, max_length=3, description="ISO-3166 alpha-3 country code"
+    )
     skills: list[str] = Field(
         ..., min_length=1, description="List of ESCO skill labels"
     )
@@ -110,6 +113,9 @@ class OccupationDetail(BaseModel):
     matching_percentage: float = Field(..., description="Percentage of occupation skills matched")
     opportunity_type: str = Field(..., description="Categorization: Formal Employment, Self-Employment, Gig")
     isced_level: int = Field(..., description="Expected ISCED education level (0-8)")
+    missing_essential_skills: list[str] = Field(..., description="List of essential skills the user is missing for this role")
+    sector_growth: float | None = Field(None, description="Annual % growth of the associated sector")
+    wage_signal: float | None = Field(None, description="Estimated monthly wage floor proxy (USD)")
 
 
 
@@ -204,22 +210,32 @@ async def lens(payload: LensRequest) -> LensResponse:
     return LensResponse(**result)
 
 
-def _process_occupations(skills: list[str], locale: str, top_n: int) -> dict[str, Any]:
+def _process_occupations(country_code: str, skills: list[str], locale: str, top_n: int) -> dict[str, Any]:
     from ml_engine.SkillAssessor import match_occupations, resolve_locale
-
+    from ml_engine.Econometrics import fetch_country_indicators
+    from ml_engine.LaborMarketSignals import calculate_occupation_signals
+    
     lang = resolve_locale(locale)
+    indicators = fetch_country_indicators(country_code)
     occupations_list = match_occupations(skills, lang=lang, top_n=top_n)
 
     # Convert list to the requested dictionary format: { occupation_name: { details } }
     results = {}
     for item in occupations_list:
         occ_name = item["occupation"]
+        isco_code = item.get("isco_group") or ""
+        
+        signals = calculate_occupation_signals(isco_code, indicators)
+        
         results[occ_name] = {
             "matching_skills": item["matching_skills"],
+            "missing_essential_skills": item["missing_essential_skills"],
             "description": item["description"],
             "matching_percentage": item["matching_percentage"],
             "opportunity_type": item["opportunity_type"],
-            "isced_level": item["isced_level"]
+            "isced_level": item["isced_level"],
+            "sector_growth": signals["sector_growth"],
+            "wage_signal": signals["wage_signal"]
         }
 
     return results
@@ -228,10 +244,10 @@ def _process_occupations(skills: list[str], locale: str, top_n: int) -> dict[str
 @router.post(
     "/occupations",
     response_model=dict[str, OccupationDetail],
-    summary="Match skills to occupations",
+    summary="Match skills to occupations with econometric signals",
     description=(
-        "Given a set of ESCO skills, returns a dictionary of the occupations that best match "
-        "based on the percentage of their required skills that the user possesses. "
+        "Given a set of ESCO skills, returns a dictionary of the occupations that best match, "
+        "including sector growth and wage signals for the given country. "
         "Set locale to MEX for Spanish or USA for English."
     ),
 )
@@ -241,6 +257,7 @@ async def occupations(payload: OccupationsRequest) -> dict[str, Any]:
         result = await loop.run_in_executor(
             None,
             _process_occupations,
+            payload.country_code,
             payload.skills,
             payload.locale,
             payload.top_n,
