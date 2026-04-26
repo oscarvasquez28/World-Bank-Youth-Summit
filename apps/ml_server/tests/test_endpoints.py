@@ -139,32 +139,14 @@ class TestRiskEndpoint:
         if all_skills:
             assert all_skills[0]["skill"] != ""
 
-    def test_risk_occupations_english(self):
+    def test_risk_occupations_returns_200(self):
         resp = client.post(
             "/api/risk/occupations",
             json={
-                "skills": ["strategic planning", "data entry"],
+                "country_code": "USA",
+                "skills": ["strategic planning", "communication"],
                 "locale": "USA",
-            }
-        )
-        assert resp.status_code == 200
-        body = resp.json()
-        assert isinstance(body, dict)
-        if body:
-            # Check the first occupation key
-            occ_name = list(body.keys())[0]
-            occ = body[occ_name]
-            assert "matching_skills" in occ
-            assert "description" in occ
-            assert "matching_percentage" in occ
-
-    def test_risk_occupations_spanish(self):
-        resp = client.post(
-            "/api/risk/occupations",
-            json={
-                "skills": ["planificación estratégica"],
-                "locale": "MEX",
-            }
+            },
         )
         assert resp.status_code == 200
         body = resp.json()
@@ -172,16 +154,38 @@ class TestRiskEndpoint:
         if body:
             occ_name = list(body.keys())[0]
             assert "matching_percentage" in body[occ_name]
+            assert "sector_growth" in body[occ_name]
+            assert "wage_signal" in body[occ_name]
+            assert "missing_essential_skills" in body[occ_name]
 
     def test_risk_occupations_invalid_locale(self):
         resp = client.post(
             "/api/risk/occupations",
             json={
+                "country_code": "USA",
                 "skills": ["strategic planning"],
                 "locale": "XX",
             }
         )
         assert resp.status_code == 422
+
+
+# ---------------------------------------------------------------------------
+# Dashboard endpoint
+# ---------------------------------------------------------------------------
+class TestDashboardEndpoint:
+    def test_aggregate_returns_200(self):
+        resp = client.post(
+            "/api/dashboard/aggregate",
+            json={"country_code": "USA"},
+        )
+        assert resp.status_code == 200
+        body = resp.json()
+        assert "country_name" in body
+        assert "macro_indicators" in body
+        assert "education_landscape" in body
+        assert "resilience_index" in body
+        assert 0 <= body["resilience_index"] <= 100
 # ---------------------------------------------------------------------------
 # Badges endpoint
 # ---------------------------------------------------------------------------

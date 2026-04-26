@@ -48,7 +48,7 @@ def _load_lang_data(lang: str):
 
         df_skills = pd.read_csv(DATA_DIR / skills_file, usecols=["conceptUri", "preferredLabel", "altLabels", "skillType"])
         df_occupations = pd.read_csv(DATA_DIR / occupations_file, usecols=["conceptUri", "preferredLabel", "iscoGroup", "description"])
-        df_relations = pd.read_csv(DATA_DIR / relations_file, usecols=["occupationUri", "skillUri"])
+        df_relations = pd.read_csv(DATA_DIR / relations_file, usecols=["occupationUri", "skillUri", "relationType"])
 
         uri_to_skill_label = dict(zip(df_skills["conceptUri"], df_skills["preferredLabel"]))
         skill_label_to_uri = dict(zip(df_skills["preferredLabel"], df_skills["conceptUri"]))
@@ -56,6 +56,10 @@ def _load_lang_data(lang: str):
         uri_to_description = dict(zip(df_occupations["conceptUri"], df_occupations["description"]))
         uri_to_skill_type = dict(zip(df_skills["conceptUri"], df_skills["skillType"]))
         uri_to_isco_group = dict(zip(df_occupations["conceptUri"], df_occupations["iscoGroup"]))
+
+        # Store essential skills per occupation
+        essential_relations = df_relations[df_relations["relationType"] == "essential"]
+        occ_to_essential_skills = essential_relations.groupby("occupationUri")["skillUri"].apply(list).to_dict()
 
         # Pre-calculate total skills per occupation for percentage calculation
         occ_total_skill_counts = df_relations.groupby("occupationUri")["skillUri"].count().to_dict()
@@ -79,6 +83,7 @@ def _load_lang_data(lang: str):
             "uri_to_skill_type": uri_to_skill_type,
             "uri_to_isco_group": uri_to_isco_group,
             "occ_total_skill_counts": occ_total_skill_counts,
+            "occ_to_essential_skills": occ_to_essential_skills,
             "df_relations": df_relations,
             "df_occupations": df_occupations,
         }
@@ -392,10 +397,17 @@ def match_occupations(
             }
             isced_level = isco_isced_map.get(isco_prefix, 3)
 
+        # Calculate missing essential skills
+        essential_uris = data["occ_to_essential_skills"].get(occ_uri, [])
+        missing_essential_uris = [u for u in essential_uris if u not in skill_uris]
+        missing_essential_labels = [uri_to_skill_label.get(u, u) for u in missing_essential_uris]
+
         results.append({
             "occupation": label,
             "occupation_uri": occ_uri,
+            "isco_group": isco_val,
             "matching_skills": matching_skill_labels,
+            "missing_essential_skills": missing_essential_labels,
             "description": description,
             "matching_percentage": round(float(matching_percentage), 2),
             "opportunity_type": opportunity_type,
