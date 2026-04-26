@@ -13,7 +13,11 @@ function keyFor(base: string) {
 export function getDetectedSkills(): string[] {
   try {
     const raw = localStorage.getItem(keyFor('detectedSkills')) || localStorage.getItem('detectedSkills');
-    return raw ? JSON.parse(raw) : [];
+    const arr = raw ? JSON.parse(raw) : [];
+    // normalize to Title Case
+    return Array.isArray(arr)
+      ? arr.map((v: any) => String(v || '').toLowerCase().replace(/\b\w/g, (c) => c.toUpperCase()))
+      : [];
   } catch (e) {
     return [];
   }
@@ -39,16 +43,24 @@ export function appendDetectedSkills(newSkills: string[]) {
   }
 }
 
-export function getDetectedOpportunities(): { role: string; salary: string }[] {
+export function getDetectedOpportunities(): { role: string }[] {
   try {
     const raw = localStorage.getItem(keyFor('detectedOpportunities')) || localStorage.getItem('detectedOpportunities');
-    return raw ? JSON.parse(raw) : [];
+    const arr = raw ? JSON.parse(raw) : [];
+    if (!Array.isArray(arr)) return [];
+    return arr.map((o: any) => {
+      const roleRaw = String((o && o.role) || '');
+      // remove trailing 'Specialist' if present and normalize to Title Case
+      const withoutSpecialist = roleRaw.replace(/\s*Specialist$/i, '');
+      const role = withoutSpecialist.toLowerCase().replace(/\b\w/g, (c) => c.toUpperCase());
+      return { role };
+    });
   } catch (e) {
     return [];
   }
 }
 
-export function setDetectedOpportunities(arr: { role: string; salary: string }[]) {
+export function setDetectedOpportunities(arr: { role: string }[]) {
   try {
     localStorage.setItem(keyFor('detectedOpportunities'), JSON.stringify(arr));
   } catch (e) {
@@ -56,13 +68,22 @@ export function setDetectedOpportunities(arr: { role: string; salary: string }[]
   }
 }
 
-export function appendDetectedOpportunities(newOps: { role: string; salary: string }[]) {
+export function appendDetectedOpportunities(newOps: { role: string }[]) {
   try {
     const cur = getDetectedOpportunities();
-    const merged = [...cur];
-    newOps.forEach((o) => {
-      if (!merged.find((m) => m.role === o.role && m.salary === o.salary)) merged.push(o);
+    // normalize incoming
+    const normalized = (newOps || []).map((o) => {
+      const roleRaw = String((o && o.role) || '');
+      const withoutSpecialist = roleRaw.replace(/\s*Specialist$/i, '');
+      const role = withoutSpecialist.toLowerCase().replace(/\b\w/g, (c) => c.toUpperCase());
+      return { role };
     });
+
+    // merge and dedupe by role
+    const map = new Map<string, { role: string }>();
+    cur.forEach((o) => map.set(o.role, o));
+    normalized.forEach((o) => map.set(o.role, o));
+    const merged = Array.from(map.values());
     localStorage.setItem(keyFor('detectedOpportunities'), JSON.stringify(merged));
     return merged;
   } catch (e) {

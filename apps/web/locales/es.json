@@ -1,0 +1,28 @@
+{
+  "nav.discover": "Descubrir",
+  "nav.opportunities": "Oportunidades",
+  "nav.for_companies": "Para empresas",
+  "auth.sign_in": "Iniciar sesión",
+  "auth.sign_out": "Cerrar sesión",
+  "home.title": "Descubre oportunidades a partir de tus habilidades",
+  "home.description": "Describe tus habilidades en texto libre y recibe sugerencias de roles y rangos salariales.",
+  "skill.label": "Describe tu experiencia informal y competencias demostradas",
+  "skill.placeholder": "Ayudo a clientes y uso Excel para generar reportes...",
+  "skill.analyze": "Analizar",
+  "country.US": "🇺🇸 Estados Unidos",
+  "country.MX": "🇲🇽 México",
+  "analyzing": "Analizando..."
+  ,"auth.signed_out": "Sesión cerrada",
+  "auth.signed_in": "Sesión iniciada"
+  ,"results.detected": "Habilidades detectadas",
+  "results.no_skills": "Aún no se detectan habilidades.",
+  "results.suggested": "Oportunidades sugeridas",
+  "results.no_opps": "Aún no hay oportunidades.",
+  "results.role_description": "Descripción breve de ejemplo para el rol."
+  ,"opportunities.title": "Oportunidades"
+  ,"opportunities.search_placeholder": "Buscar habilidades..."
+  ,"opportunities.no_skills_saved": "Aún no hay habilidades guardadas."
+  ,"opportunities.for_skill": "Oportunidades para {{skill}}"
+  ,"opportunities.no_for_skill": "No hay oportunidades para esta habilidad."
+  ,"opportunities.other": "Otras oportunidades"
+}

@@ -7,10 +7,12 @@ import { Card } from "@/components/ui/card";
 import { motion } from 'framer-motion';
 import storage from '@/lib/storage';
 import { onAuthChange, getUser } from '@/lib/auth';
+import { useI18n } from '@/lib/i18n'
 
 export default function OpportunitiesPage() {
+  const { t } = useI18n();
   const [skills, setSkills] = useState<string[]>([]);
-  const [opportunities, setOpportunities] = useState<{ role: string; salary: string }[]>([]);
+  const [opportunities, setOpportunities] = useState<{ role: string; salary?: string }[]>([]);
   const [searchQuery, setSearchQuery] = useState<string>("");
   const [selectedSkills, setSelectedSkills] = useState<string[]>([]);
 
@@ -53,31 +55,31 @@ export default function OpportunitiesPage() {
     <div className="flex min-h-screen items-start bg-transparent p-8 pt-16 font-sans">
       <main className="mx-auto w-full max-w-7xl">
         <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }}>
-          <h1 className="mb-6 text-3xl text-center font-extrabold">Opportunities</h1>
+          <h1 className="mb-6 text-3xl text-center font-extrabold">{t('opportunities.title')}</h1>
 
           <div className="grid grid-cols-1 gap-6 md:grid-cols-[minmax(0,1fr)_2fr]">
             <aside className="w-full">
 
               <Card className="sticky top-20 h-fit p-4">
-              <h3 className="mb-6 text-2xl font-semibold text-center">Detected Skills</h3>
+              <h3 className="mb-6 text-2xl font-semibold text-center">{t('results.detected')}</h3>
                   <div className="mb-3">
                     <input
                       value={searchQuery}
                       onChange={(e) => setSearchQuery(e.target.value)}
-                      placeholder="Search skills..."
+                      placeholder={t('opportunities.search_placeholder')}
                       className="w-full rounded-md border border-neutral-100 px-3 py-2 text-sm shadow-sm bg-white placeholder:text-zinc-500 focus:outline-none focus:ring-2 focus:ring-primary/50 dark:border-neutral-700 dark:bg-zinc-700 dark:text-zinc-100 dark:placeholder:text-zinc-400"
                     />
                   </div>
 
                 <div className="flex flex-wrap gap-2">
-                  {skills.length === 0 && <p className="text-sm text-zinc-500">No skills saved yet.</p>}
+                  {skills.length === 0 && <p className="text-sm text-zinc-500">{t('opportunities.no_skills_saved')}</p>}
                   {skills
                     .filter((s) => s.toLowerCase().includes(searchQuery.trim().toLowerCase()))
-                    .map((s) => {
+                    .map((s, idx) => {
                       const active = selectedSkills.includes(s);
                       return (
                         <Badge
-                          key={s}
+                          key={`${s}-${idx}`}
                           onClick={() => {
                             setSelectedSkills((prev) => (prev.includes(s) ? prev.filter((x) => x !== s) : [...prev, s]));
                           }}
@@ -118,17 +120,17 @@ export default function OpportunitiesPage() {
                     opportunities.forEach((o) => {
                       if (pattern.test(o.role)) {
                         groups[s].push(o);
-                        matchedSet.add(o.role + '||' + o.salary);
+                        matchedSet.add(o.role);
                       }
                     });
                   });
 
-                  // collect unmatched opportunities into Other
-                  const other = opportunities.filter((o) => !matchedSet.has(o.role + '||' + o.salary));
+                  // collect unmatched opportunities into Other (match only by role)
+                  const other = opportunities.filter((o) => !matchedSet.has(o.role));
                   if (other.length > 0) groups['Other'] = other;
 
                   if (selected.length === 0 && opportunities.length === 0) {
-                    return <p className="text-sm text-zinc-500">No opportunities yet.</p>;
+                    return <p className="text-sm text-zinc-500">{t('results.no_opps')}</p>;
                   }
 
                   // when no selection, show per-skill groups for all skills
@@ -136,36 +138,34 @@ export default function OpportunitiesPage() {
 
                   return (
                     <div className="space-y-6">
-                      {keys.map((skill) => (
-                        <motion.div key={skill} initial={{ opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }}>
-                          <h2 className="mb-3 text-lg font-semibold dark:text-zinc-100">Opportunities for {skill}</h2>
+                      {keys.map((skill, skillIdx) => (
+                        <motion.div key={`${skill}-${skillIdx}`} initial={{ opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }}>
+                          <h2 className="mb-3 text-lg font-semibold dark:text-zinc-100">{t('opportunities.for_skill').replace('{{skill}}', skill)}</h2>
                           <div className="grid gap-4 md:grid-cols-2">
-                            {(groups[skill] || []).map((o) => (
-                              <Card key={o.role + '|' + o.salary} className="p-4">
+                            {(groups[skill] || []).map((o, idx) => (
+                              <Card key={`${o.role}-${idx}`} className="p-4">
                                 <div className="flex items-start justify-between gap-4">
                                   <div>
                                     <div className="text-sm font-semibold">{o.role}</div>
-                                    <div className="mt-1 text-sm text-zinc-600 dark:text-zinc-400">{o.salary}</div>
                                   </div>
                                 </div>
                                 <div className="text-sm text-zinc-500 dark:text-zinc-400 mt-2">Brief description placeholder for the role.</div>
                               </Card>
                             ))}
-                            {(groups[skill] || []).length === 0 && <p className="text-sm text-zinc-500">No opportunities for this skill.</p>}
+                            {(groups[skill] || []).length === 0 && <p className="text-sm text-zinc-500">{t('opportunities.no_for_skill')}</p>}
                           </div>
                         </motion.div>
                       ))}
 
                       {groups['Other'] && groups['Other'].length > 0 && (
                         <motion.div initial={{ opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }}>
-                          <h2 className="mb-3 text-lg font-semibold">Other Opportunities</h2>
+                          <h2 className="mb-3 text-lg font-semibold">{t('opportunities.other')}</h2>
                           <div className="grid gap-4 md:grid-cols-2">
-                            {groups['Other'].map((o) => (
-                              <Card key={o.role + '|' + o.salary} className="p-4">
+                            {groups['Other'].map((o, idx) => (
+                              <Card key={`${o.role}-${idx}`} className="p-4">
                                 <div className="flex items-start justify-between gap-4">
                                   <div>
                                     <div className="text-sm font-semibold">{o.role}</div>
-                                    <div className="mt-1 text-sm text-zinc-600">{o.salary}</div>
                                   </div>
                                 </div>
                                 <div className="text-sm text-zinc-500 mt-2">Brief description placeholder for the role.</div>

@@ -4,6 +4,11 @@ import { randomUUID } from 'crypto';
 const app = express();
 const port = process.env.PORT || 3001;
 
+// Normalize skill strings to Title Case (first letter of each word uppercase)
+const titleCase = (v: any) => String(v || '')
+	.toLowerCase()
+	.replace(/\b\w/g, (c) => c.toUpperCase());
+
 // Parse JSON bodies
 app.use(express.json());
 
@@ -63,8 +68,11 @@ app.post('/analyze', async (req, res) => {
 			console.warn('Failed to call external skills model, falling back to tokenization', e);
 		}
 
+		// Normalize detected skill strings to Title Case before returning
+		detected = detected.map(titleCase);
+
 		const opportunities = detected.slice(0, 4).map((s) => ({
-			role: `${s} Specialist`,
+			role: String(s),
 			salary: country === 'US' ? '$60k - $95k' : '$20k - $40k',
 		}));
 
