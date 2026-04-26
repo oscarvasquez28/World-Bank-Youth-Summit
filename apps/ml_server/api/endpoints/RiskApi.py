@@ -76,10 +76,17 @@ class SkillRiskItem(BaseModel):
     risk_score: float
 
 
+class ResiliencePathwayItem(SkillRiskItem):
+    opportunity_type: str = Field(
+        ...,
+        description="Categorization of the opportunity: Formal Employment, Self-Employment, Gig, or Training"
+    )
+
+
 class LensResponse(BaseModel):
     skills_at_risk: list[SkillRiskItem]
     durable_skills: list[SkillRiskItem]
-    resilience_pathways: list[SkillRiskItem]
+    resilience_pathways: list[ResiliencePathwayItem]
     market_context: dict[str, Any]
 
 

@@ -46,7 +46,7 @@ def _load_lang_data(lang: str):
         occupations_file = _settings.OCCUPATIONS_CSV.replace("_en.csv", suffix)
         relations_file = _settings.OCCUPATION_SKILL_RELATIONS_CSV.replace("_en.csv", suffix)
 
-        df_skills = pd.read_csv(DATA_DIR / skills_file, usecols=["conceptUri", "preferredLabel", "altLabels"])
+        df_skills = pd.read_csv(DATA_DIR / skills_file, usecols=["conceptUri", "preferredLabel", "altLabels", "skillType"])
         df_occupations = pd.read_csv(DATA_DIR / occupations_file, usecols=["conceptUri", "preferredLabel", "iscoGroup", "description"])
         df_relations = pd.read_csv(DATA_DIR / relations_file, usecols=["occupationUri", "skillUri"])
 
@@ -54,6 +54,8 @@ def _load_lang_data(lang: str):
         skill_label_to_uri = dict(zip(df_skills["preferredLabel"], df_skills["conceptUri"]))
         uri_to_occ_label = dict(zip(df_occupations["conceptUri"], df_occupations["preferredLabel"]))
         uri_to_description = dict(zip(df_occupations["conceptUri"], df_occupations["description"]))
+        uri_to_skill_type = dict(zip(df_skills["conceptUri"], df_skills["skillType"]))
+        uri_to_isco_group = dict(zip(df_occupations["conceptUri"], df_occupations["iscoGroup"]))
 
         # Pre-calculate total skills per occupation for percentage calculation
         occ_total_skill_counts = df_relations.groupby("occupationUri")["skillUri"].count().to_dict()
@@ -74,6 +76,8 @@ def _load_lang_data(lang: str):
             "alt_label_to_uri": alt_label_to_uri,
             "uri_to_occ_label": uri_to_occ_label,
             "uri_to_description": uri_to_description,
+            "uri_to_skill_type": uri_to_skill_type,
+            "uri_to_isco_group": uri_to_isco_group,
             "occ_total_skill_counts": occ_total_skill_counts,
             "df_relations": df_relations,
             "df_occupations": df_occupations,
@@ -86,6 +90,8 @@ def _load_lang_data(lang: str):
             "alt_label_to_uri": {},
             "uri_to_occ_label": {},
             "uri_to_description": {},
+            "uri_to_skill_type": {},
+            "uri_to_isco_group": {},
             "occ_total_skill_counts": {},
             "df_relations": pd.DataFrame(),
             "df_occupations": pd.DataFrame(),
@@ -243,6 +249,10 @@ def recommend_adjacent_skills(
     adjacent_skills = DF_RELATIONS[DF_RELATIONS["occupationUri"].isin(related_occs)]["skillUri"].unique()
 
     candidates = []
+    data_lang = LANG_DATA.get(output_lang, LANG_DATA["en"])
+    uri_to_skill_type = data_lang["uri_to_skill_type"]
+    uri_to_isco_group = data_lang["uri_to_isco_group"]
+    
     for skill_uri in adjacent_skills:
         if skill_uri in user_durable_uris:
             continue
@@ -253,9 +263,33 @@ def recommend_adjacent_skills(
             if calibrated_risk <= CALIBRATED_RISK_THRESHOLD:
                 label = _translate_skill(skill_uri, output_lang)
                 if label:
+                    skill_type = uri_to_skill_type.get(skill_uri, "")
+                    opportunity_type = "Formal Employment"
+                    
+                    if skill_type == "knowledge":
+                        opportunity_type = "Training"
+                    else:
+                        occ_uris = DF_RELATIONS[DF_RELATIONS["skillUri"] == skill_uri]["occupationUri"].tolist()
+                        isco_prefixes = []
+                        for o_uri in occ_uris:
+                            isco_val = uri_to_isco_group.get(o_uri)
+                            if pd.notna(isco_val):
+                                isco_prefixes.append(str(isco_val)[0])
+                        
+                        if isco_prefixes:
+                            from collections import Counter
+                            most_common_prefix = Counter(isco_prefixes).most_common(1)[0][0]
+                            if most_common_prefix in ("1", "2", "3", "4", "8"):
+                                opportunity_type = "Formal Employment"
+                            elif most_common_prefix in ("5", "6", "7"):
+                                opportunity_type = "Self-Employment"
+                            elif most_common_prefix == "9":
+                                opportunity_type = "Gig"
+
                     candidates.append({
                         "skill": label,
                         "risk_score": calibrated_risk,
+                        "opportunity_type": opportunity_type,
                     })
 
     # Sort candidates by risk score ascending (lowest risk first)
