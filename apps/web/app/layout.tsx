@@ -3,6 +3,7 @@ import { Inter, JetBrains_Mono } from "next/font/google";
 import "./globals.css";
 import PageTransition from "@/components/PageTransition";
 import Navbar from "@/components/Navbar";
+import { Toaster } from 'sonner';
 
 const inter = Inter({
   variable: "--font-sans",
@@ -28,11 +29,12 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" className={`${inter.variable} ${jetbrains.variable} h-full antialiased`}>
-      <body className="min-h-full flex flex-col bg-gradient-to-b from-neutral-50 via-neutral-50 to-neutral-100">
+      <body className="min-h-full flex flex-col bg-gradient-to-b from-neutral-50 via-neutral-50 to-neutral-100 dark:from-neutral-900 dark:via-neutral-900 dark:to-neutral-800 text-zinc-900 dark:text-zinc-100">
         <Navbar />
         <PageTransition>
           <div className="mx-auto w-full max-w-7xl px-6">{children}</div>
         </PageTransition>
+        <Toaster richColors position="top-center" />
       </body>
     </html>
   );

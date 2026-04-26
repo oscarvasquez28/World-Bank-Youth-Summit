@@ -1,4 +1,5 @@
 import express from 'express';
+import { randomUUID } from 'crypto';
 
 const app = express();
 const port = process.env.PORT || 3001;
@@ -40,6 +41,46 @@ app.post('/analyze', (req, res) => {
 		res.json({ skills: detected, opportunities });
 	} catch (err) {
 		console.error('Error in /analyze handler', err);
+		res.status(500).json({ error: 'Internal server error' });
+	}
+});
+
+// Simple in-memory user store (for demo / dev only)
+type User = { id: string; name?: string; email: string; password: string };
+const users: User[] = [];
+
+app.post('/auth/register', (req, res) => {
+	try {
+		const { name, email, password } = req.body || {};
+		if (!email || !password) return res.status(400).json({ error: 'email and password required' });
+
+		const exists = users.find((u) => u.email.toLowerCase() === String(email).toLowerCase());
+		if (exists) return res.status(409).json({ error: 'user already exists' });
+
+		const user: User = { id: randomUUID(), name: name || '', email: String(email), password: String(password) };
+		users.push(user);
+
+		// Return sanitized user
+		const { password: _p, ...safe } = user as any;
+		res.status(201).json({ user: safe });
+	} catch (err) {
+		console.error('Error in /auth/register', err);
+		res.status(500).json({ error: 'Internal server error' });
+	}
+});
+
+app.post('/auth/signin', (req, res) => {
+	try {
+		const { email, password } = req.body || {};
+		if (!email || !password) return res.status(400).json({ error: 'email and password required' });
+
+		const user = users.find((u) => u.email.toLowerCase() === String(email).toLowerCase() && u.password === String(password));
+		if (!user) return res.status(401).json({ error: 'invalid credentials' });
+
+		const { password: _p, ...safe } = user as any;
+		res.json({ user: safe });
+	} catch (err) {
+		console.error('Error in /auth/signin', err);
 		res.status(500).json({ error: 'Internal server error' });
 	}
 });
