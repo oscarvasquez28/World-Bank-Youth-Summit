@@ -7,6 +7,7 @@ uvicorn[standard]>=0.29.0
 # because it pins torch<2.0 which is unavailable for Python 3.12+.
 # Its actual runtime dependencies are listed below individually.
 spacy>=3.7.0,<3.9.0
+./local_models/en_skillner-0.0.1-py3-none-any.whl
 sentence-transformers>=2.1.0,<4.0.0
 torch>=2.2.0
 transformers>=4.0.0

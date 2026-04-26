@@ -9,26 +9,48 @@ This is the machine learning backend for the UNMAPPED Protocol. It exposes predi
 
 ### Steps to Run Locally
 
-1. **Activate the Virtual Environment**
+1. **Install Python 3.12**
+   Download using
+   ```powershell
+   Start-Process "https://www.python.org/ftp/python/3.12.10/python-3.12.10-amd64.exe"
+   ```
+
+2. **Create the Virtual Environment**
+   From the root folder of the repository, create a virtual environment:
+   ```powershell
+   py -3.12 -m venv .venv
+   ```
+
+3. **Activate the Virtual Environment**
    From the root folder of the repository, activate the existing virtual environment:
    ```powershell
    .\.venv\Scripts\Activate.ps1
    ```
 
-2. **Navigate to the ML Server Directory**
+4. **Navigate to the ML Server Directory and Download the en_skillner model**
    Move into the `apps/ml_server` folder:
    ```powershell
    cd apps/ml_server
    ```
+   Download the en_skillner model:
+   ```powershell
+   python -c "import urllib.request; print('Downloading en_skillner model (587 MB)...'); urllib.request.urlretrieve('https://huggingface.co/nestauk/en_skillner/resolve/main/en_skillner-any-py3-none-any.whl', 'local_models/en_skillner-0.0.1-py3-none-any.whl'); print('Download complete!')"
+   ```
 
-3. **Start the Uvicorn Server**
+5. **Install Requirements**
+   Install the Python dependencies listed in `Requirements.txt`:
+   ```powershell
+   pip install -r Requirements.txt
+   ```
+
+6. **Start the Uvicorn Server**
    Start the FastAPI server using the virtual environment's Python module. Do **not** run just `uvicorn` as it might default to the global path.
    ```powershell
    python -m uvicorn api.Main:app --reload --port 8000
    ```
 
 Once started, the interactive API documentation (Swagger UI) is available at:
-👉 **http://127.0.0.1:8000/docs**
+👉 **http://localhost:8000/docs**
 
 ---
 
